@@ -1,0 +1,2299 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["rhel-openssl-3.0.x", "native"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                          String                  @id @default(uuid())
+  email                       String                  @unique
+  username                    String                  @unique
+  passwordHash                String?                 @map("password_hash")
+  avatarUrl                   String?                 @map("avatar_url")
+  bio                         String?
+  eloRating                   Int                     @default(1200) @map("elo_rating")
+  debatesWon                  Int                     @default(0) @map("debates_won")
+  debatesLost                 Int                     @default(0) @map("debates_lost")
+  debatesTied                 Int                     @default(0) @map("debates_tied")
+  totalDebates                Int                     @default(0) @map("total_debates")
+  totalScore                  Int                     @default(0) @map("total_score")
+  totalMaxScore               Int                     @default(0) @map("total_max_score")
+  totalWordCount              Int                     @default(0) @map("total_word_count")
+  totalStatements             Int                     @default(0) @map("total_statements")
+  averageWordCount            Float                   @default(0) @map("average_word_count")
+  averageRounds               Float                   @default(0) @map("average_rounds")
+  isAdmin                     Boolean                 @default(false) @map("is_admin")
+  isBanned                    Boolean                 @default(false) @map("is_banned")
+  employeeRole                String?                 @map("employee_role")
+  accessLevel                 String?                 @map("access_level")
+  isCreator                   Boolean                 @default(false) @map("is_creator")
+  creatorStatus               CreatorStatus?
+  creatorSince                DateTime?               @map("creator_since")
+  profileBannerAvailable      Boolean                 @default(true) @map("profile_banner_available")
+  postDebateAvailable         Boolean                 @default(true) @map("post_debate_available")
+  debateWidgetAvailable       Boolean                 @default(true) @map("debate_widget_available")
+  profileBannerPrice          Decimal?                @map("profile_banner_price") @db.Decimal(10, 2)
+  postDebatePrice             Decimal?                @map("post_debate_price") @db.Decimal(10, 2)
+  debateWidgetPrice           Decimal?                @map("debate_widget_price") @db.Decimal(10, 2)
+  avgMonthlyViews             Int                     @default(0) @map("avg_monthly_views")
+  avgDebateViews              Int                     @default(0) @map("avg_debate_views")
+  followerCount               Int                     @default(0) @map("follower_count")
+  profileVisits               Int                     @default(0) @map("profile_visits")
+  createdAt                   DateTime                @default(now()) @map("created_at")
+  updatedAt                   DateTime                @updatedAt @map("updated_at")
+  strikes                     Int                     @default(0)
+  bannedUntil                 DateTime?               @map("banned_until")
+  banReason                   String?                 @map("ban_reason")
+  rankedBanned                Boolean                 @default(false) @map("ranked_banned")
+  aiPaused                    Boolean                 @default(false) @map("ai_paused")
+  aiPersonality               String?                 @map("ai_personality")
+  aiResponseDelay             Int?                    @map("ai_response_delay")
+  isAI                        Boolean                 @default(false) @map("is_ai")
+  googleAuthEnabled           Boolean                 @default(false) @map("google_auth_enabled")
+  googleEmail                 String?                 @map("google_email")
+  googleId                    String?                 @unique @map("google_id")
+  googlePicture               String?                 @map("google_picture")
+  totpBackupCodes             String?                 @map("totp_backup_codes")
+  totpEnabled                 Boolean                 @default(false) @map("totp_enabled")
+  totpSecret                  String?                 @map("totp_secret")
+  totalBeltDefenses           Int                     @default(0) @map("total_belt_defenses")
+  longestBeltHeld             Int                     @default(0) @map("longest_belt_held")
+  currentBeltsCount           Int                     @default(0) @map("current_belts_count")
+  totalBeltWins               Int                     @default(0) @map("total_belt_wins")
+  coins                       Int                     @default(0)
+  freeBeltChallengesAvailable Int                     @default(1) @map("free_belt_challenges_available")
+  lastFreeChallengeReset      DateTime?               @map("last_free_challenge_reset")
+  consecutiveLoginDays        Int                     @default(0) @map("consecutive_login_days")
+  lastDailyRewardDate         DateTime?               @map("last_daily_reward_date")
+  lastLoginDate               DateTime?               @map("last_login_date")
+  longestLoginStreak          Int                     @default(0) @map("longest_login_streak")
+  totalLoginDays              Int                     @default(0) @map("total_login_days")
+  hasCompletedOnboarding      Boolean                 @default(false) @map("has_completed_onboarding")
+  debateStreak                Int                     @default(0) @map("debate_streak")
+  longestDebateStreak         Int                     @default(0) @map("longest_debate_streak")
+  lastDebateDate              DateTime?               @map("last_debate_date")
+  activeContracts             AdContract[]            @relation("CreatorContracts")
+  apiUsage                    ApiUsage[]
+  appealLimit                 AppealLimit?
+  appealSubscriptions         AppealSubscription[]
+  beltChallengesReceived      BeltChallenge[]         @relation("BeltHolderChallenge")
+  beltChallengesSent          BeltChallenge[]         @relation("BeltChallenger")
+  beltHistoryFrom             BeltHistory[]           @relation("BeltHistoryFrom")
+  beltHistoryTo               BeltHistory[]           @relation("BeltHistoryTo")
+  beltsHeld                   Belt[]                  @relation("BeltHolder")
+  blogPosts                   BlogPost[]              @relation("BlogPostAuthor")
+  cardMembers                 CardMember[]            @relation("CardMembers")
+  chatMessages                ChatMessage[]
+  coinTransactions            CoinTransaction[]       @relation("CoinTransactionUser")
+  conversationsAsUser1        Conversation[]          @relation("User1")
+  conversationsAsUser2        Conversation[]          @relation("User2")
+  creatorTaxInfo              CreatorTaxInfo?
+  debateComments              DebateComment[]
+  debateLikes                 DebateLike[]
+  debateParticipations        DebateParticipant[]     @relation("DebateParticipants")
+  debateSaves                 DebateSave[]
+  debateShares                DebateShare[]
+  challengerDebates           Debate[]                @relation("Challenger")
+  opponentDebates             Debate[]                @relation("Opponent")
+  receivedMessages            DirectMessage[]         @relation("MessageReceiver")
+  sentMessages                DirectMessage[]         @relation("MessageSender")
+  fcmTokens                   FCMToken[]              @relation("FCMTokens")
+  following                   Follow[]                @relation("Follower")
+  followers                   Follow[]                @relation("Following")
+  createdModels               ModelVersion[]          @relation("ModelCreator")
+  notifications               Notification[]
+  offersReceived              Offer[]                 @relation("OffersReceived")
+  predictions                 Prediction[]
+  reports                     Report[]
+  sessions                    Session[]
+  statements                  Statement[]
+  supportTicketReplies        SupportTicketReply[]
+  assignedTickets             SupportTicket[]         @relation("AssignedTickets")
+  supportTickets              SupportTicket[]
+  tournamentParticipations    TournamentParticipant[] @relation("TournamentParticipant")
+  tournamentSubscription      TournamentSubscription?
+  createdTournaments          Tournament[]            @relation("TournamentCreator")
+  wonTournaments              Tournament[]            @relation("TournamentWinner")
+  usageTracking               UsageTracking[]
+  subscription                UserSubscription?
+
+  @@index([email])
+  @@index([username])
+  @@index([eloRating])
+  @@index([isBanned])
+  @@index([isAdmin])
+  @@index([coins])
+  @@map("users")
+}
+
+model AppealLimit {
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  monthlyLimit Int      @default(4) @map("monthly_limit")
+  currentCount Int      @default(0) @map("current_count")
+  resetDate    DateTime @default(now()) @map("reset_date")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("appeal_limits")
+}
+
+model AppealSubscription {
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  planName             String    @map("plan_name")
+  appealsIncluded      Int       @map("appeals_included")
+  price                Decimal   @db.Decimal(10, 2)
+  status               String
+  startDate            DateTime  @default(now()) @map("start_date")
+  endDate              DateTime? @map("end_date")
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("appeal_subscriptions")
+}
+
+model SubscriptionPlan {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  price           Decimal  @db.Decimal(10, 2)
+  billingCycle    String
+  features        String
+  appealLimit     Int?     @map("appeal_limit")
+  debateLimit     Int?     @map("debate_limit")
+  prioritySupport Boolean  @default(false) @map("priority_support")
+  customBadge     String?  @map("custom_badge")
+  stripePriceId   String?  @unique @map("stripe_price_id")
+  stripeProductId String?  @map("stripe_product_id")
+  isActive        Boolean  @default(false) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive])
+  @@index([billingCycle])
+  @@map("subscription_plans")
+}
+
+model UserSubscription {
+  id                   String     @id @default(uuid())
+  userId               String     @unique @map("user_id")
+  tier                 String
+  billingCycle         String?
+  status               String     @default("ACTIVE")
+  currentPeriodStart   DateTime?  @map("current_period_start")
+  currentPeriodEnd     DateTime?  @map("current_period_end")
+  stripeCustomerId     String?    @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?    @unique @map("stripe_subscription_id")
+  stripePriceId        String?    @map("stripe_price_id")
+  promoCodeId          String?    @map("promo_code_id")
+  cancelAtPeriodEnd    Boolean    @default(false) @map("cancel_at_period_end")
+  cancelledAt          DateTime?  @map("cancelled_at")
+  createdAt            DateTime   @default(now()) @map("created_at")
+  updatedAt            DateTime   @updatedAt @map("updated_at")
+  promoCode            PromoCode? @relation(fields: [promoCodeId], references: [id])
+  user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([tier])
+  @@map("user_subscriptions")
+}
+
+model PromoCode {
+  id            String             @id @default(uuid())
+  code          String             @unique
+  description   String?
+  discountType  String
+  discountValue Decimal            @db.Decimal(10, 2)
+  maxUses       Int?               @map("max_uses")
+  currentUses   Int                @default(0) @map("current_uses")
+  validFrom     DateTime           @map("valid_from")
+  validUntil    DateTime?          @map("valid_until")
+  applicableTo  String             @default("PRO")
+  billingCycles String?            @map("billing_cycles")
+  isActive      Boolean            @default(true) @map("is_active")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+  createdBy     String?            @map("created_by")
+  subscriptions UserSubscription[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([validUntil])
+  @@map("promo_codes")
+}
+
+model UsageTracking {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  featureType String
+  count       Int      @default(0)
+  periodStart DateTime @map("period_start")
+  periodEnd   DateTime @map("period_end")
+  periodType  String   @default("MONTHLY")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, featureType, periodStart])
+  @@index([userId])
+  @@index([featureType])
+  @@index([periodStart])
+  @@map("usage_tracking")
+}
+
+model Advertisement {
+  id          String    @id @default(uuid())
+  title       String
+  type        String
+  creativeUrl String    @map("creative_url")
+  targetUrl   String    @map("target_url")
+  status      String    @default("DRAFT")
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  impressions Int       @default(0)
+  clicks      Int       @default(0)
+  category    String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([type])
+  @@index([category])
+  @@map("advertisements")
+}
+
+model Advertiser {
+  id               String           @id @default(uuid())
+  companyName      String           @map("company_name")
+  website          String
+  industry         String
+  contactEmail     String           @unique @map("contact_email")
+  contactName      String           @map("contact_name")
+  businessEIN      String?          @map("business_ein")
+  status           AdvertiserStatus @default(PENDING)
+  stripeAccountId  String?          @unique @map("stripe_account_id")
+  paymentReady     Boolean          @default(false) @map("payment_ready")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  approvedAt       DateTime?        @map("approved_at")
+  approvedBy       String?          @map("approved_by")
+  rejectionReason  String?          @map("rejection_reason")
+  suspendedAt      DateTime?        @map("suspended_at")
+  suspensionReason String?          @map("suspension_reason")
+  contactPhone     String?          @map("contact_phone")
+  companySize      String?          @map("company_size")
+  monthlyAdBudget  String?          @map("monthly_ad_budget")
+  marketingGoals   String?          @map("marketing_goals")
+  contracts        AdContract[]
+  campaigns        Campaign[]
+  offers           Offer[]
+
+  @@index([status])
+  @@index([contactEmail])
+  @@index([createdAt])
+  @@map("advertisers")
+}
+
+model Campaign {
+  id                  String         @id @default(uuid())
+  advertiserId        String         @map("advertiser_id")
+  name                String
+  type                CampaignType
+  category            String
+  budget              Decimal        @db.Decimal(10, 2)
+  startDate           DateTime       @map("start_date")
+  endDate             DateTime       @map("end_date")
+  bannerUrl           String?        @map("banner_url")
+  videoUrl            String?        @map("video_url")
+  destinationUrl      String         @map("destination_url")
+  ctaText             String         @default("Learn More") @map("cta_text")
+  minELO              Int?           @map("min_elo")
+  targetCategories    String[]       @map("target_categories")
+  minFollowers        Int?           @map("min_followers")
+  maxBudgetPerCreator Decimal?       @map("max_budget_per_creator") @db.Decimal(10, 2)
+  status              CampaignStatus @default(PENDING_REVIEW)
+  rejectionReason     String?        @map("rejection_reason")
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+  approvedAt          DateTime?      @map("approved_at")
+  paymentStatus       String?        @map("payment_status") @db.VarChar(20)
+  stripePaymentId     String?        @map("stripe_payment_id") @db.VarChar(255)
+  paidAt              DateTime?      @map("paid_at") @db.Timestamp(6)
+  adType              String?        @map("ad_type")
+  contracts           AdContract[]
+  advertiser          Advertiser     @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  clicks              Click[]
+  impressions         Impression[]
+  offers              Offer[]
+
+  @@index([advertiserId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@index([type])
+  @@map("campaigns")
+}
+
+model Offer {
+  id               String        @id @default(uuid())
+  advertiserId     String        @map("advertiser_id")
+  campaignId       String        @map("campaign_id")
+  creatorId        String        @map("creator_id")
+  placement        PlacementType
+  duration         Int
+  paymentType      PaymentType   @map("payment_type")
+  amount           Decimal       @db.Decimal(10, 2)
+  cpcRate          Decimal?      @map("cpc_rate") @db.Decimal(10, 2)
+  cpmRate          Decimal?      @map("cpm_rate") @db.Decimal(10, 2)
+  message          String?
+  status           OfferStatus   @default(PENDING)
+  counterAmount    Decimal?      @map("counter_amount") @db.Decimal(10, 2)
+  counterMessage   String?       @map("counter_message")
+  negotiationRound Int           @default(0) @map("negotiation_round")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  expiresAt        DateTime      @map("expires_at")
+  respondedAt      DateTime?     @map("responded_at")
+  contract         AdContract?
+  advertiser       Advertiser    @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  campaign         Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  creator          User          @relation("OffersReceived", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@index([advertiserId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("offers")
+}
+
+model AdContract {
+  id                   String         @id @default(uuid())
+  offerId              String         @unique @map("offer_id")
+  advertiserId         String         @map("advertiser_id")
+  creatorId            String         @map("creator_id")
+  campaignId           String         @map("campaign_id")
+  placement            PlacementType
+  totalAmount          Decimal        @map("total_amount") @db.Decimal(10, 2)
+  platformFee          Decimal        @map("platform_fee") @db.Decimal(10, 2)
+  creatorPayout        Decimal        @map("creator_payout") @db.Decimal(10, 2)
+  startDate            DateTime       @map("start_date")
+  endDate              DateTime       @map("end_date")
+  impressionsDelivered Int            @default(0) @map("impressions_delivered")
+  clicksDelivered      Int            @default(0) @map("clicks_delivered")
+  status               ContractStatus @default(SCHEDULED)
+  signedAt             DateTime       @default(now()) @map("signed_at")
+  completedAt          DateTime?      @map("completed_at")
+  cancelledAt          DateTime?      @map("cancelled_at")
+  cancellationReason   String?        @map("cancellation_reason")
+  escrowHeld           Boolean        @default(false) @map("escrow_held")
+  payoutSent           Boolean        @default(false) @map("payout_sent")
+  payoutDate           DateTime?      @map("payout_date")
+  stripePaymentId      String?        @map("stripe_payment_id")
+  stripePayoutId       String?        @map("stripe_payout_id")
+  advertiser           Advertiser     @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  campaign             Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  creator              User           @relation("CreatorContracts", fields: [creatorId], references: [id], onDelete: Cascade)
+  offer                Offer          @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  clicks               Click[]
+  impressions          Impression[]
+
+  @@index([creatorId])
+  @@index([advertiserId])
+  @@index([status])
+  @@index([endDate])
+  @@index([signedAt, status]) // For finance revenue calculations by date
+  @@map("ad_contracts")
+}
+
+model Impression {
+  id         String     @id @default(uuid())
+  contractId String     @map("contract_id")
+  campaignId String     @map("campaign_id")
+  userId     String?    @map("user_id")
+  ipAddress  String     @map("ip_address")
+  userAgent  String     @map("user_agent")
+  referrer   String?
+  timestamp  DateTime   @default(now())
+  campaign   Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contract   AdContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([campaignId])
+  @@index([timestamp])
+  @@index([ipAddress])
+  @@map("impressions")
+}
+
+model Click {
+  id         String     @id @default(uuid())
+  contractId String     @map("contract_id")
+  campaignId String     @map("campaign_id")
+  userId     String?    @map("user_id")
+  ipAddress  String     @map("ip_address")
+  userAgent  String     @map("user_agent")
+  referrer   String?
+  timestamp  DateTime   @default(now())
+  campaign   Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contract   AdContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([campaignId])
+  @@index([timestamp])
+  @@index([ipAddress])
+  @@map("clicks")
+}
+
+model CreatorTaxInfo {
+  id              String   @id @default(uuid())
+  creatorId       String   @unique @map("creator_id")
+  stripeAccountId String   @unique @map("stripe_account_id")
+  legalName       String?  @map("legal_name")
+  businessName    String?  @map("business_name")
+  taxIdType       String?  @map("tax_id_type")
+  country         String?
+  taxFormComplete Boolean  @default(false) @map("tax_form_complete")
+  w9Submitted     Boolean  @default(false) @map("w9_submitted")
+  w9SubmittedAt   DateTime? @map("w9_submitted_at")
+  bankVerified    Boolean  @default(false) @map("bank_verified")
+  payoutEnabled   Boolean  @default(false) @map("payout_enabled")
+  yearlyEarnings  Json     @default("{}") @map("yearly_earnings")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  creator         User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  taxForms1099     TaxForm1099[]
+
+  @@map("creator_tax_info")
+}
+
+model TaxForm1099 {
+  id                 String   @id @default(uuid())
+  creatorTaxInfoId  String   @map("creator_tax_info_id")
+  taxYear           Int      @map("tax_year")
+  totalCompensation Decimal  @map("total_compensation")
+  status            String   @default("GENERATED") @map("status")
+  pdfUrl            String?  @map("pdf_url")
+  generatedAt       DateTime? @map("generated_at")
+  sentToCreator     Boolean  @default(false) @map("sent_to_creator")
+  sentAt            DateTime? @map("sent_at")
+  filedWithIRS      Boolean  @default(false) @map("filed_with_irs")
+  filedAt           DateTime? @map("filed_at")
+  irsFilingId       String?  @map("irs_filing_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  creatorTaxInfo    CreatorTaxInfo @relation(fields: [creatorTaxInfoId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorTaxInfoId, taxYear])
+  @@map("tax_form_1099")
+}
+
+model SocialMediaPost {
+  id             String               @id @default(uuid())
+  debateId       String?              @map("debate_id")
+  platform       String
+  content        String
+  imagePrompt    String?              @map("image_prompt")
+  hashtags       String?
+  status         String               @default("DRAFT")
+  scheduledAt    DateTime?            @map("scheduled_at")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+  calendarItemId String?              @unique @map("calendar_item_id")
+  publishedAt    DateTime?            @map("published_at")
+  strategyId     String?              @map("strategy_id")
+  analytics      ContentAnalytics[]
+  calendarItem   ContentCalendarItem? @relation(fields: [calendarItemId], references: [id])
+  debate         Debate?              @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  strategy       MarketingStrategy?   @relation(fields: [strategyId], references: [id])
+
+  @@index([debateId])
+  @@index([platform])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("social_media_posts")
+}
+
+model MarketingStrategy {
+  id            String                @id @default(uuid())
+  name          String
+  description   String?
+  startDate     DateTime              @map("start_date")
+  endDate       DateTime              @map("end_date")
+  status        String                @default("DRAFT")
+  goals         String?
+  themes        String?
+  platforms     String?
+  frequency     String?
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+  blogPosts     BlogPost[]
+  calendarItems ContentCalendarItem[]
+  newsletters   EmailNewsletter[]
+  posts         SocialMediaPost[]
+
+  @@index([status])
+  @@index([startDate])
+  @@map("marketing_strategies")
+}
+
+model ContentCalendarItem {
+  id               String             @id @default(uuid())
+  strategyId       String?            @map("strategy_id")
+  contentType      String             @map("content_type")
+  title            String?
+  description      String?
+  scheduledDate    DateTime           @map("scheduled_date")
+  scheduledTime    String?            @map("scheduled_time")
+  status           String             @default("DRAFT")
+  platform         String?
+  requiresApproval Boolean            @default(true) @map("requires_approval")
+  approvedAt       DateTime?          @map("approved_at")
+  approvedBy       String?            @map("approved_by")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  blogPost         BlogPost?
+  strategy         MarketingStrategy? @relation(fields: [strategyId], references: [id])
+  newsletter       EmailNewsletter?
+  socialPost       SocialMediaPost?
+
+  @@index([scheduledDate])
+  @@index([status])
+  @@index([contentType])
+  @@map("content_calendar_items")
+}
+
+model EmailNewsletter {
+  id             String               @id @default(uuid())
+  strategyId     String?              @map("strategy_id")
+  subject        String
+  content        String
+  htmlContent    String?              @map("html_content")
+  status         String               @default("DRAFT")
+  sentAt         DateTime?            @map("sent_at")
+  recipientCount Int?                 @map("recipient_count")
+  openRate       Float?               @map("open_rate")
+  clickRate      Float?               @map("click_rate")
+  calendarItemId String?              @unique @map("calendar_item_id")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+  calendarItem   ContentCalendarItem? @relation(fields: [calendarItemId], references: [id])
+  strategy       MarketingStrategy?   @relation(fields: [strategyId], references: [id])
+
+  @@index([status])
+  @@index([sentAt])
+  @@map("email_newsletters")
+}
+
+model ContentAnalytics {
+  id               String           @id @default(uuid())
+  socialPostId     String?          @map("social_post_id")
+  blogPostId       String?          @map("blog_post_id")
+  contentType      String           @map("content_type")
+  platform         String?
+  impressions      Int              @default(0)
+  reach            Int              @default(0)
+  likes            Int              @default(0)
+  comments         Int              @default(0)
+  shares           Int              @default(0)
+  clicks           Int              @default(0)
+  saves            Int              @default(0)
+  engagementRate   Float?           @map("engagement_rate")
+  clickThroughRate Float?           @map("click_through_rate")
+  recordedAt       DateTime         @default(now()) @map("recorded_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  blogPost         BlogPost?        @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  socialPost       SocialMediaPost? @relation(fields: [socialPostId], references: [id], onDelete: Cascade)
+
+  @@index([socialPostId])
+  @@index([blogPostId])
+  @@index([recordedAt])
+  @@map("content_analytics")
+}
+
+model Session {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  token             String   @unique
+  expiresAt         DateTime @map("expires_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  twoFactorVerified Boolean  @default(false) @map("two_factor_verified")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  usedAt    DateTime? @map("used_at")
+
+  @@index([email])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model Debate {
+  id                    String              @id @default(uuid())
+  topic                 String
+  description           String?
+  category              DebateCategory
+  challengerId          String              @map("challenger_id")
+  opponentId            String?             @map("opponent_id")
+  challengeType         String              @default("OPEN") @map("challenge_type")
+  invitedUserIds        String?             @map("invited_user_ids")
+  invitedBy             String?             @map("invited_by")
+  challengerPosition    DebatePosition      @map("challenger_position")
+  opponentPosition      DebatePosition      @map("opponent_position")
+  totalRounds           Int                 @default(5) @map("total_rounds")
+  currentRound          Int                 @default(1) @map("current_round")
+  roundDuration         Int                 @default(86400000) @map("round_duration")
+  speedMode             Boolean             @default(false) @map("speed_mode")
+  status                DebateStatus        @default(WAITING)
+  winnerId              String?             @map("winner_id")
+  verdictReached        Boolean             @default(false) @map("verdict_reached")
+  verdictDate           DateTime?           @map("verdict_date")
+  appealedAt            DateTime?           @map("appealed_at")
+  appealStatus          AppealStatus?       @map("appeal_status")
+  appealCount           Int                 @default(0) @map("appeal_count")
+  appealedBy            String?             @map("appealed_by")
+  originalWinnerId      String?             @map("original_winner_id")
+  appealReason          String?             @map("appeal_reason")
+  appealedStatements    String?             @map("appealed_statements")
+  appealRejectionReason String?             @map("appeal_rejection_reason")
+  rematchRequestedBy    String?             @map("rematch_requested_by")
+  rematchRequestedAt    DateTime?           @map("rematch_requested_at")
+  rematchStatus         RematchStatus?      @map("rematch_status")
+  originalDebateId      String?             @map("original_debate_id")
+  rematchDebateId       String?             @map("rematch_debate_id")
+  spectatorCount        Int                 @default(0) @map("spectator_count")
+  viewCount             Int                 @default(0) @map("view_count")
+  featured              Boolean             @default(false)
+  allowCopyPaste        Boolean             @default(true) @map("allow_copy_paste")
+  isPrivate             Boolean             @default(false) @map("is_private")
+  shareToken            String?             @unique @map("share_token")
+  challengerEloChange   Int?                @map("challenger_elo_change")
+  opponentEloChange     Int?                @map("opponent_elo_change")
+  startedAt             DateTime?           @map("started_at")
+  endedAt               DateTime?           @map("ended_at")
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+  roundDeadline         DateTime?           @map("round_deadline")
+  visibility            DebateVisibility    @default(PRIVATE)
+  slug                  String?             @unique
+  isOnboardingDebate    Boolean             @default(false) @map("is_onboarding_debate")
+  beltStakeType         String?             @map("belt_stake_type")
+  hasBeltAtStake        Boolean             @default(false) @map("has_belt_at_stake")
+  apiUsage              ApiUsage[]
+  appealPredictions     AppealPrediction?
+  beltChallenge         BeltChallenge?      @relation("BeltChallengeDebate")
+  beltHistory           BeltHistory[]       @relation("BeltHistoryDebate")
+  stakedBelt            Belt?               @relation("BeltStakedDebate")
+  chatMessages          ChatMessage[]
+  comments              DebateComment[]
+  images                DebateImage[]
+  likes                 DebateLike[]
+  participants          DebateParticipant[]
+  saves                 DebateSave[]
+  shares                DebateShare[]
+  tags                  DebateTag[]
+  challenger            User                @relation("Challenger", fields: [challengerId], references: [id], onDelete: Cascade)
+  opponent              User?               @relation("Opponent", fields: [opponentId], references: [id])
+  notifications         Notification[]
+  predictions           Prediction[]
+  reports               Report[]
+  socialMediaPosts      SocialMediaPost[]
+  statements            Statement[]
+  tournamentMatch       TournamentMatch?    @relation("TournamentDebate")
+  verdicts              Verdict[]
+
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@index([challengerId])
+  @@index([opponentId])
+  @@index([slug])
+  @@index([status, visibility]) // List debates by status and visibility
+  @@index([challengerId, status]) // User's debates by status
+  @@index([opponentId, status]) // Opponent's debates by status
+  @@map("debates")
+}
+
+model DebateParticipant {
+  id        String         @id @default(uuid())
+  debateId  String         @map("debate_id")
+  userId    String         @map("user_id")
+  position  DebatePosition
+  status    String         @default("INVITED")
+  joinedAt  DateTime?      @map("joined_at")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  debate    Debate         @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  user      User           @relation("DebateParticipants", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, userId])
+  @@index([debateId])
+  @@index([userId])
+  @@index([status])
+  @@map("debate_participants")
+}
+
+model Statement {
+  id            String    @id @default(uuid())
+  debateId      String    @map("debate_id")
+  authorId      String    @map("author_id")
+  round         Int
+  content       String
+  flagged       Boolean   @default(false)
+  flaggedReason String?   @map("flagged_reason")
+  moderatedAt   DateTime? @map("moderated_at")
+  aiModerated   Boolean   @default(false) @map("ai_moderated")
+  aiAction      String?   @map("ai_action")
+  aiConfidence  Int?      @map("ai_confidence")
+  aiReasoning   String?   @map("ai_reasoning")
+  aiSeverity    String?   @map("ai_severity")
+  aiModeratedAt DateTime? @map("ai_moderated_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  debate        Debate    @relation(fields: [debateId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, authorId, round])
+  @@index([debateId])
+  @@index([authorId])
+  @@map("statements")
+}
+
+model DebateImage {
+  id         String   @id @default(uuid())
+  debateId   String   @map("debate_id")
+  url        String
+  alt        String?
+  caption    String?
+  order      Int      @default(0)
+  width      Int?
+  height     Int?
+  fileSize   Int?     @map("file_size")
+  mimeType   String?  @map("mime_type")
+  uploadedBy String?  @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  debate     Debate   @relation(fields: [debateId], references: [id], onDelete: Cascade)
+
+  @@index([debateId])
+  @@index([order])
+  @@map("debate_images")
+}
+
+model Judge {
+  id            String       @id @default(uuid())
+  name          String       @unique
+  personality   String
+  emoji         String
+  description   String
+  systemPrompt  String       @map("system_prompt")
+  debatesJudged Int          @default(0) @map("debates_judged")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  tournaments   Tournament[]
+  verdicts      Verdict[]
+
+  @@map("judges")
+}
+
+model Verdict {
+  id              String          @id @default(uuid())
+  debateId        String          @map("debate_id")
+  judgeId         String          @map("judge_id")
+  winnerId        String?         @map("winner_id")
+  decision        VerdictDecision
+  reasoning       String
+  challengerScore Int?            @map("challenger_score")
+  opponentScore   Int?            @map("opponent_score")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  debate          Debate          @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  judge           Judge           @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, judgeId])
+  @@index([debateId])
+  @@map("verdicts")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  message   String
+  debateId  String?          @map("debate_id")
+  read      Boolean          @default(false)
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+  debate    Debate?          @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([userId, read]) // Get unread notifications for user
+  @@index([createdAt]) // Sort notifications by date
+  @@map("notifications")
+}
+
+model FCMToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  device    String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation("FCMTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("fcm_tokens")
+}
+
+model ChatMessage {
+  id        String    @id @default(uuid())
+  debateId  String    @map("debate_id")
+  authorId  String    @map("author_id")
+  content   String
+  deleted   Boolean   @default(false)
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  debate    Debate    @relation(fields: [debateId], references: [id], onDelete: Cascade)
+
+  @@index([debateId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([debateId, createdAt])
+  @@map("chat_messages")
+}
+
+model Report {
+  id            String       @id @default(uuid())
+  debateId      String?      @map("debate_id")
+  reporterId    String       @map("reporter_id")
+  reason        String
+  description   String?
+  status        ReportStatus @default(PENDING)
+  reviewedBy    String?      @map("reviewed_by")
+  reviewedAt    DateTime?    @map("reviewed_at")
+  resolution    String?
+  aiModerated   Boolean      @default(false) @map("ai_moderated")
+  aiAction      String?      @map("ai_action")
+  aiConfidence  Int?         @map("ai_confidence")
+  aiReasoning   String?      @map("ai_reasoning")
+  aiSeverity    String?      @map("ai_severity")
+  aiModeratedAt DateTime?    @map("ai_moderated_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  debate        Debate?      @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  reporter      User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([aiModerated])
+  @@map("reports")
+}
+
+model Prediction {
+  id                String   @id @default(uuid())
+  debateId          String   @map("debate_id")
+  userId            String   @map("user_id")
+  predictedWinnerId String   @map("predicted_winner_id")
+  confidence        Int
+  correct           Boolean?
+  points            Int?
+  createdAt         DateTime @default(now()) @map("created_at")
+  debate            Debate   @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, userId])
+  @@index([userId])
+  @@map("predictions")
+}
+
+model AdminSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  encrypted   Boolean  @default(false)
+  description String?
+  category    String?
+  updatedBy   String?  @map("updated_by")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([category])
+  @@map("admin_settings")
+}
+
+model WaitingList {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  username     String    @unique
+  passwordHash String    @map("password_hash")
+  position     Int
+  notified     Boolean   @default(false) @map("notified")
+  approved     Boolean   @default(false) @map("approved")
+  approvedAt   DateTime? @map("approved_at")
+  approvedBy   String?   @map("approved_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([position])
+  @@index([approved])
+  @@map("waiting_list")
+}
+
+model ApiUsage {
+  id               String   @id @default(uuid())
+  provider         String
+  endpoint         String
+  model            String?
+  promptTokens     Int?     @map("prompt_tokens")
+  completionTokens Int?     @map("completion_tokens")
+  totalTokens      Int?     @map("total_tokens")
+  cost             Float    @default(0)
+  costPer1kTokens  Float?   @map("cost_per_1k_tokens")
+  debateId         String?  @map("debate_id")
+  userId           String?  @map("user_id")
+  success          Boolean  @default(true)
+  errorMessage     String?  @map("error_message")
+  responseTime     Int?     @map("response_time")
+  metadata         String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  debate           Debate?  @relation(fields: [debateId], references: [id])
+  user             User?    @relation(fields: [userId], references: [id])
+
+  @@index([provider])
+  @@index([debateId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("api_usage")
+}
+
+model SeedDebate {
+  id             String         @id @default(uuid())
+  topic          String
+  category       DebateCategory
+  challengerName String         @map("challenger_name")
+  opponentName   String         @map("opponent_name")
+  statements     String
+  verdictData    String         @map("verdict_data")
+  featured       Boolean        @default(false)
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  @@index([category])
+  @@map("seed_debates")
+}
+
+model DebateLike {
+  id        String   @id @default(uuid())
+  debateId  String   @map("debate_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  debate    Debate   @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, userId])
+  @@index([debateId])
+  @@index([userId])
+  @@map("debate_likes")
+}
+
+model DebateSave {
+  id        String   @id @default(uuid())
+  debateId  String   @map("debate_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  debate    Debate   @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, userId])
+  @@index([debateId])
+  @@index([userId])
+  @@map("debate_saves")
+}
+
+model DebateShare {
+  id        String   @id @default(uuid())
+  debateId  String   @map("debate_id")
+  userId    String   @map("user_id")
+  method    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  debate    Debate   @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([debateId])
+  @@index([userId])
+  @@map("debate_shares")
+}
+
+model DebateComment {
+  id        String          @id @default(uuid())
+  debateId  String          @map("debate_id")
+  userId    String          @map("user_id")
+  content   String
+  parentId  String?         @map("parent_id")
+  deleted   Boolean         @default(false)
+  deletedAt DateTime?       @map("deleted_at")
+  deletedBy String?         @map("deleted_by")
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+  debate    Debate          @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  parent    DebateComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   DebateComment[] @relation("CommentReplies")
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([debateId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@index([debateId, createdAt])
+  @@map("debate_comments")
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model Tag {
+  id         String      @id @default(uuid())
+  name       String      @unique
+  color      String      @default("#00aaff")
+  usageCount Int         @default(0) @map("usage_count")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  debateTags DebateTag[]
+
+  @@index([name])
+  @@index([usageCount])
+  @@map("tags")
+}
+
+model DebateTag {
+  id        String   @id @default(uuid())
+  debateId  String   @map("debate_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  debate    Debate   @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([debateId, tagId])
+  @@index([debateId])
+  @@index([tagId])
+  @@map("debate_tags")
+}
+
+model ModelVersion {
+  id                String             @id @default(uuid())
+  name              String
+  version           String
+  description       String?
+  modelType         String             @map("model_type")
+  config            String?
+  isActive          Boolean            @default(false) @map("is_active")
+  isDefault         Boolean            @default(false) @map("is_default")
+  createdBy         String?            @map("created_by")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  abTestsA          ABTest[]           @relation("ABTestModelA")
+  abTestsB          ABTest[]           @relation("ABTestModelB")
+  appealPredictions AppealPrediction[]
+  metrics           ModelMetric[]
+  creator           User?              @relation("ModelCreator", fields: [createdBy], references: [id])
+
+  @@unique([name, version])
+  @@index([modelType])
+  @@index([isActive])
+  @@map("model_versions")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  label       String
+  description String?
+  color       String?
+  icon        String?
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model DailyChallenge {
+  id           String         @id @default(uuid())
+  topic        String
+  description  String?
+  category     DebateCategory
+  forLabel     String         @map("for_label")
+  againstLabel String         @map("against_label")
+  activeDate   DateTime       @unique @map("active_date") @db.Date
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  @@map("daily_challenges")
+}
+
+model ModelMetric {
+  id             String       @id @default(uuid())
+  modelVersionId String       @map("model_version_id")
+  metricType     String       @map("metric_type")
+  metricValue    Float        @map("metric_value")
+  dataset        String?
+  period         String?
+  recordedAt     DateTime     @default(now()) @map("recorded_at")
+  notes          String?
+  modelVersion   ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@index([modelVersionId])
+  @@index([metricType])
+  @@index([recordedAt])
+  @@map("model_metrics")
+}
+
+model ABTest {
+  id              String       @id @default(uuid())
+  name            String
+  description     String?
+  modelVersionAId String       @map("model_version_a_id")
+  modelVersionBId String       @map("model_version_b_id")
+  trafficSplit    Int          @default(50) @map("traffic_split")
+  startDate       DateTime     @map("start_date")
+  endDate         DateTime?    @map("end_date")
+  status          String       @default("draft")
+  isActive        Boolean      @default(false) @map("is_active")
+  modelAScore     Float?       @map("model_a_score")
+  modelBScore     Float?       @map("model_b_score")
+  winner          String?
+  createdBy       String?      @map("created_by")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  modelVersionA   ModelVersion @relation("ABTestModelA", fields: [modelVersionAId], references: [id], onDelete: Cascade)
+  modelVersionB   ModelVersion @relation("ABTestModelB", fields: [modelVersionBId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([isActive])
+  @@index([startDate])
+  @@map("ab_tests")
+}
+
+model AppealPrediction {
+  id               String        @id @default(uuid())
+  debateId         String        @unique @map("debate_id")
+  modelVersionId   String?       @map("model_version_id")
+  predictedSuccess Boolean       @map("predicted_success")
+  confidence       Float
+  reasoning        String?
+  actualSuccess    Boolean?      @map("actual_success")
+  predictedAt      DateTime      @default(now()) @map("predicted_at")
+  resolvedAt       DateTime?     @map("resolved_at")
+  debate           Debate        @relation(fields: [debateId], references: [id], onDelete: Cascade)
+  modelVersion     ModelVersion? @relation(fields: [modelVersionId], references: [id])
+
+  @@index([modelVersionId])
+  @@index([predictedSuccess])
+  @@index([actualSuccess])
+  @@map("appeal_predictions")
+}
+
+model HomepageSection {
+  id              String           @id @default(uuid())
+  key             String           @unique
+  title           String?
+  content         String?
+  order           Int              @default(0)
+  isVisible       Boolean          @default(true) @map("is_visible")
+  contactEmail    String?          @map("contact_email")
+  metaTitle       String?          @map("meta_title")
+  metaDescription String?          @map("meta_description")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  buttons         HomepageButton[]
+  images          HomepageImage[]
+
+  @@index([key])
+  @@index([order])
+  @@index([isVisible])
+  @@map("homepage_sections")
+}
+
+model HomepageImage {
+  id            String          @id @default(uuid())
+  sectionId     String          @map("section_id")
+  url           String
+  alt           String?
+  caption       String?
+  linkUrl       String?         @map("link_url")
+  order         Int             @default(0)
+  width         Int?
+  height        Int?
+  fileSize      Int?            @map("file_size")
+  mimeType      String?         @map("mime_type")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  imagePosition String?         @default("left") @map("image_position")
+  section       HomepageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([order])
+  @@map("homepage_images")
+}
+
+model HomepageButton {
+  id        String          @id @default(uuid())
+  sectionId String          @map("section_id")
+  text      String
+  url       String?
+  variant   String          @default("primary")
+  order     Int             @default(0)
+  isVisible Boolean         @default(true) @map("is_visible")
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+  section   HomepageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([order])
+  @@map("homepage_buttons")
+}
+
+model MediaLibrary {
+  id                  String     @id @default(uuid())
+  url                 String     @unique
+  filename            String
+  alt                 String?
+  caption             String?
+  width               Int?
+  height              Int?
+  fileSize            Int        @map("file_size")
+  mimeType            String     @map("mime_type")
+  usedIn              String?    @map("used_in")
+  uploadedBy          String?    @map("uploaded_by")
+  uploadedAt          DateTime   @default(now()) @map("uploaded_at")
+  featuredInBlogPosts BlogPost[] @relation("BlogPostFeaturedImage")
+
+  @@index([usedIn])
+  @@index([uploadedBy])
+  @@index([uploadedAt])
+  @@map("media_library")
+}
+
+model LegalPage {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  title           String
+  content         String
+  isVisible       Boolean  @default(true) @map("is_visible")
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([isVisible])
+  @@map("legal_pages")
+}
+
+model StaticPage {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  title           String
+  content         String
+  isVisible       Boolean  @default(true) @map("is_visible")
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  keywords        String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([isVisible])
+  @@map("static_pages")
+}
+
+model SocialMediaLink {
+  id        String   @id @default(uuid())
+  platform  String   @unique
+  url       String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([platform])
+  @@index([isActive])
+  @@index([order])
+  @@map("social_media_links")
+}
+
+model Tournament {
+  id               String                  @id @default(uuid())
+  name             String
+  description      String?
+  creatorId        String                  @map("creator_id")
+  maxParticipants  Int                     @default(16) @map("max_participants")
+  currentRound     Int                     @default(1) @map("current_round")
+  totalRounds      Int                     @map("total_rounds")
+  status           TournamentStatus        @default(UPCOMING)
+  minElo           Int?                    @map("min_elo")
+  judgeId          String?                 @map("judge_id")
+  startDate        DateTime                @map("start_date")
+  endDate          DateTime?               @map("end_date")
+  roundDuration    Int                     @map("round_duration")
+  reseedAfterRound Boolean                 @default(true) @map("reseed_after_round")
+  reseedMethod     ReseedMethod            @default(ELO_BASED) @map("reseed_method")
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+  isPrivate        Boolean                 @default(false) @map("is_private")
+  invitedUserIds   String?                 @map("invited_user_ids")
+  format           TournamentFormat        @default(BRACKET)
+  assignedJudges   String?                 @map("assigned_judges")
+  beltCreationCost Int?                    @map("belt_creation_cost")
+  beltCreatedBy    String?                 @map("belt_created_by")
+  beltCreated      Boolean                 @default(false) @map("belt_created")
+  prizePool        Int?                    @map("prize_pool")
+  prizeDistribution String?                @map("prize_distribution")
+  entryFee         Int?                    @map("entry_fee")
+  winnerId         String?                 @map("winner_id")
+  beltHistory      BeltHistory[]           @relation("BeltHistoryTournament")
+  stakedBelts      Belt[]                  @relation("BeltStakedTournament")
+  tournamentBelt   Belt?                   @relation("TournamentBelt")
+  matches          TournamentMatch[]
+  participants     TournamentParticipant[]
+  rounds           TournamentRound[]
+  creator          User                    @relation("TournamentCreator", fields: [creatorId], references: [id])
+  judge            Judge?                  @relation(fields: [judgeId], references: [id])
+  winner           User?                   @relation("TournamentWinner", fields: [winnerId], references: [id])
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([status, startDate]) // Find upcoming tournaments
+  @@map("tournaments")
+}
+
+model TournamentParticipant {
+  id                String            @id @default(uuid())
+  tournamentId      String            @map("tournament_id")
+  userId            String            @map("user_id")
+  seed              Int?
+  currentSeed       Int?              @map("current_seed")
+  wins              Int               @default(0)
+  losses            Int               @default(0)
+  eloAtStart        Int               @map("elo_at_start")
+  status            ParticipantStatus @default(REGISTERED)
+  eliminatedAt      DateTime?         @map("eliminated_at")
+  registeredAt      DateTime          @default(now()) @map("registered_at")
+  selectedPosition  String?           @map("selected_position")
+  cumulativeScore   Int?              @map("cumulative_score")
+  eliminationRound  Int?              @map("elimination_round")
+  eliminationReason String?           @map("elimination_reason")
+  matches1          TournamentMatch[] @relation("Participant1")
+  matches2          TournamentMatch[] @relation("Participant2")
+  wonMatches        TournamentMatch[] @relation("MatchWinner")
+  tournament        Tournament        @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user              User              @relation("TournamentParticipant", fields: [userId], references: [id])
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
+  @@map("tournament_participants")
+}
+
+model TournamentRound {
+  id           String            @id @default(uuid())
+  tournamentId String            @map("tournament_id")
+  roundNumber  Int               @map("round_number")
+  status       RoundStatus       @default(UPCOMING)
+  startDate    DateTime?         @map("start_date")
+  endDate      DateTime?         @map("end_date")
+  matches      TournamentMatch[]
+  tournament   Tournament        @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, roundNumber])
+  @@index([tournamentId])
+  @@map("tournament_rounds")
+}
+
+model TournamentMatch {
+  id                         String                 @id @default(uuid())
+  tournamentId               String                 @map("tournament_id")
+  roundId                    String                 @map("round_id")
+  participant1Id             String                 @map("participant1_id")
+  participant2Id             String                 @map("participant2_id")
+  debateId                   String?                @unique @map("debate_id")
+  winnerId                   String?                @map("winner_id")
+  status                     MatchStatus            @default(SCHEDULED)
+  scheduledAt                DateTime?              @map("scheduled_at")
+  completedAt                DateTime?              @map("completed_at")
+  participant1Score          Int?                   @map("participant1_score")
+  participant2Score          Int?                   @map("participant2_score")
+  participant1ScoreBreakdown Json?                  @map("participant1_score_breakdown")
+  participant2ScoreBreakdown Json?                  @map("participant2_score_breakdown")
+  debate                     Debate?                @relation("TournamentDebate", fields: [debateId], references: [id])
+  participant1               TournamentParticipant  @relation("Participant1", fields: [participant1Id], references: [id])
+  participant2               TournamentParticipant  @relation("Participant2", fields: [participant2Id], references: [id])
+  round                      TournamentRound        @relation(fields: [roundId], references: [id])
+  tournament                 Tournament             @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  winner                     TournamentParticipant? @relation("MatchWinner", fields: [winnerId], references: [id])
+
+  @@index([tournamentId])
+  @@index([roundId])
+  @@index([debateId])
+  @@map("tournament_matches")
+}
+
+model TournamentSubscription {
+  id                   String             @id @default(uuid())
+  userId               String             @unique @map("user_id")
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
+  stripeCustomerId     String?            @map("stripe_customer_id")
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart   DateTime           @map("current_period_start")
+  currentPeriodEnd     DateTime           @map("current_period_end")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  cancelledAt          DateTime?          @map("cancelled_at")
+  user                 User               @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("tournament_subscriptions")
+}
+
+model SupportTicket {
+  id           String                @id @default(uuid())
+  userId       String                @map("user_id")
+  subject      String
+  description  String
+  category     String?
+  status       SupportTicketStatus   @default(OPEN)
+  priority     SupportTicketPriority @default(MEDIUM)
+  assignedToId String?               @map("assigned_to_id")
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @updatedAt @map("updated_at")
+  resolvedAt   DateTime?             @map("resolved_at")
+  closedAt     DateTime?             @map("closed_at")
+  replies      SupportTicketReply[]
+  assignedTo   User?                 @relation("AssignedTickets", fields: [assignedToId], references: [id])
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+model SupportTicketReply {
+  id         String        @id @default(uuid())
+  ticketId   String        @map("ticket_id")
+  authorId   String        @map("author_id")
+  content    String
+  isInternal Boolean       @default(false) @map("is_internal")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  author     User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("support_ticket_replies")
+}
+
+model Conversation {
+  id              String          @id @default(uuid())
+  user1Id         String          @map("user1_id")
+  user2Id         String          @map("user2_id")
+  lastMessageId   String?         @map("last_message_id")
+  lastMessageAt   DateTime?       @map("last_message_at")
+  user1LastReadAt DateTime?       @map("user1_last_read_at")
+  user2LastReadAt DateTime?       @map("user2_last_read_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  user1           User            @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2           User            @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages        DirectMessage[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+model DirectMessage {
+  id                String       @id @default(uuid())
+  conversationId    String       @map("conversation_id")
+  senderId          String       @map("sender_id")
+  receiverId        String       @map("receiver_id")
+  content           String
+  isRead            Boolean      @default(false) @map("is_read")
+  readAt            DateTime?    @map("read_at")
+  deletedBySender   Boolean      @default(false) @map("deleted_by_sender")
+  deletedByReceiver Boolean      @default(false) @map("deleted_by_receiver")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  receiver          User         @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender            User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@map("direct_messages")
+}
+
+model BlogPost {
+  id              String               @id @default(uuid())
+  slug            String               @unique
+  title           String
+  excerpt         String?
+  content         String
+  metaTitle       String?              @map("meta_title")
+  metaDescription String?              @map("meta_description")
+  keywords        String?
+  ogImage         String?              @map("og_image")
+  status          BlogPostStatus       @default(DRAFT)
+  publishedAt     DateTime?            @map("published_at")
+  authorId        String               @map("author_id")
+  featuredImageId String?              @map("featured_image_id")
+  views           Int                  @default(0)
+  featured        Boolean              @default(false)
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  calendarItemId  String?              @unique @map("calendar_item_id")
+  strategyId      String?              @map("strategy_id")
+  categories      BlogPostToCategory[]
+  tags            BlogPostToTag[]
+  author          User                 @relation("BlogPostAuthor", fields: [authorId], references: [id])
+  calendarItem    ContentCalendarItem? @relation(fields: [calendarItemId], references: [id])
+  featuredImage   MediaLibrary?        @relation("BlogPostFeaturedImage", fields: [featuredImageId], references: [id])
+  strategy        MarketingStrategy?   @relation(fields: [strategyId], references: [id])
+  analytics       ContentAnalytics[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+  @@index([featured])
+  @@index([createdAt])
+  @@map("blog_posts")
+}
+
+model BlogPostCategory {
+  id          String               @id @default(uuid())
+  name        String               @unique
+  slug        String               @unique
+  description String?
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+  posts       BlogPostToCategory[]
+
+  @@index([slug])
+  @@map("blog_post_categories")
+}
+
+model BlogPostTag {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  slug      String          @unique
+  createdAt DateTime        @default(now()) @map("created_at")
+  posts     BlogPostToTag[]
+
+  @@index([slug])
+  @@map("blog_post_tags")
+}
+
+model BlogPostToCategory {
+  postId     String           @map("post_id")
+  categoryId String           @map("category_id")
+  category   BlogPostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  post       BlogPost         @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+  @@index([postId])
+  @@index([categoryId])
+  @@map("blog_post_to_categories")
+}
+
+model BlogPostToTag {
+  postId String      @map("post_id")
+  tagId  String      @map("tag_id")
+  post   BlogPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    BlogPostTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+  @@map("blog_post_to_tags")
+}
+
+model Board {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  color       String?  @default("#0079bf")
+  isArchived  Boolean  @default(false) @map("is_archived")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  lists       List[]
+
+  @@index([isArchived])
+  @@map("boards")
+}
+
+model List {
+  id         String   @id @default(uuid())
+  boardId    String   @map("board_id")
+  name       String
+  position   Int      @default(0)
+  isArchived Boolean  @default(false) @map("is_archived")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  cards      Card[]
+  board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@index([boardId])
+  @@index([position])
+  @@map("lists")
+}
+
+model Card {
+  id           String            @id @default(uuid())
+  listId       String            @map("list_id")
+  title        String
+  description  String?
+  position     Int               @default(0)
+  dueDate      DateTime?         @map("due_date")
+  isArchived   Boolean           @default(false) @map("is_archived")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  latitude     Float?
+  location     String?
+  longitude    Float?
+  reminderDate DateTime?         @map("reminder_date")
+  startDate    DateTime?         @map("start_date")
+  attachments  CardAttachment[]
+  checklists   CardChecklist[]
+  customFields CardCustomField[]
+  labels       CardLabel[]
+  members      CardMember[]
+  list         List              @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([listId])
+  @@index([position])
+  @@map("cards")
+}
+
+model CardLabel {
+  id        String   @id @default(uuid())
+  cardId    String   @map("card_id")
+  name      String
+  color     String   @default("#61bd4f")
+  createdAt DateTime @default(now()) @map("created_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("card_labels")
+}
+
+model CardChecklist {
+  id        String              @id @default(uuid())
+  cardId    String              @map("card_id")
+  title     String              @default("Checklist")
+  position  Int                 @default(0)
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+  items     CardChecklistItem[]
+  card      Card                @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("card_checklists")
+}
+
+model CardChecklistItem {
+  id          String        @id @default(uuid())
+  checklistId String        @map("checklist_id")
+  text        String
+  isCompleted Boolean       @default(false) @map("is_completed")
+  position    Int           @default(0)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  checklist   CardChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+  @@map("card_checklist_items")
+}
+
+model CardMember {
+  id        String   @id @default(uuid())
+  cardId    String   @map("card_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user      User     @relation("CardMembers", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, userId])
+  @@index([cardId])
+  @@index([userId])
+  @@map("card_members")
+}
+
+model CardAttachment {
+  id         String   @id @default(uuid())
+  cardId     String   @map("card_id")
+  name       String
+  url        String
+  type       String
+  mimeType   String?  @map("mime_type")
+  fileSize   Int?     @map("file_size")
+  uploadedBy String?  @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("card_attachments")
+}
+
+model CardCustomField {
+  id        String   @id @default(uuid())
+  cardId    String   @map("card_id")
+  name      String
+  value     String
+  fieldType String   @default("text") @map("field_type")
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("card_custom_fields")
+}
+
+model Belt {
+  id                   String            @id @default(uuid())
+  name                 String
+  type                 BeltType
+  category             String?
+  currentHolderId      String?           @map("current_holder_id")
+  status               BeltStatus        @default(VACANT)
+  acquiredAt           DateTime?         @map("acquired_at")
+  lastDefendedAt       DateTime?         @map("last_defended_at")
+  nextDefenseDue       DateTime?         @map("next_defense_due")
+  inactiveAt           DateTime?         @map("inactive_at")
+  timesDefended        Int               @default(0) @map("times_defended")
+  successfulDefenses   Int               @default(0) @map("successful_defenses")
+  totalDaysHeld        Int               @default(0) @map("total_days_held")
+  gracePeriodEnds      DateTime?         @map("grace_period_ends")
+  isFirstHolder        Boolean           @default(false) @map("is_first_holder")
+  isStaked             Boolean           @default(false) @map("is_staked")
+  stakedInDebateId     String?           @unique @map("staked_in_debate_id")
+  stakedInTournamentId String?           @map("staked_in_tournament_id")
+  tournamentId         String?           @unique @map("tournament_id")
+  designImageUrl       String?           @map("design_image_url")
+  designColors         Json?             @map("design_colors")
+  sponsorId            String?           @map("sponsor_id")
+  sponsorName          String?           @map("sponsor_name")
+  sponsorLogoUrl       String?           @map("sponsor_logo_url")
+  coinValue            Int               @default(0) @map("coin_value")
+  creationCost         Int               @default(0) @map("creation_cost")
+  isActive             Boolean           @default(true) @map("is_active")
+  adminNotes           String?           @map("admin_notes")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+  challenges           BeltChallenge[]
+  history              BeltHistory[]
+  currentHolder        User?             @relation("BeltHolder", fields: [currentHolderId], references: [id])
+  stakedInDebate       Debate?           @relation("BeltStakedDebate", fields: [stakedInDebateId], references: [id])
+  stakedInTournament   Tournament?       @relation("BeltStakedTournament", fields: [stakedInTournamentId], references: [id])
+  tournament           Tournament?       @relation("TournamentBelt", fields: [tournamentId], references: [id])
+  coinTransactions     CoinTransaction[] @relation("CoinTransactionBelt")
+
+  @@index([currentHolderId])
+  @@index([type])
+  @@index([category])
+  @@index([status])
+  @@index([tournamentId])
+  @@index([stakedInDebateId])
+  @@index([stakedInTournamentId])
+  @@map("belts")
+}
+
+model BeltHistory {
+  id            String             @id @default(uuid())
+  beltId        String             @map("belt_id")
+  fromUserId    String?            @map("from_user_id")
+  toUserId      String?            @map("to_user_id")
+  reason        BeltTransferReason
+  debateId      String?            @map("debate_id")
+  tournamentId  String?            @map("tournament_id")
+  daysHeld      Int                @map("days_held")
+  defensesWon   Int                @map("defenses_won")
+  defensesLost  Int                @map("defenses_lost")
+  adminNotes    String?            @map("admin_notes")
+  transferredBy String?            @map("transferred_by")
+  transferredAt DateTime           @default(now()) @map("transferred_at")
+  belt          Belt               @relation(fields: [beltId], references: [id], onDelete: Cascade)
+  debate        Debate?            @relation("BeltHistoryDebate", fields: [debateId], references: [id])
+  fromUser      User?              @relation("BeltHistoryFrom", fields: [fromUserId], references: [id])
+  toUser        User?              @relation("BeltHistoryTo", fields: [toUserId], references: [id])
+  tournament    Tournament?        @relation("BeltHistoryTournament", fields: [tournamentId], references: [id])
+
+  @@index([beltId])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([debateId])
+  @@index([tournamentId])
+  @@map("belt_history")
+}
+
+model BeltChallenge {
+  id                       String            @id @default(uuid())
+  beltId                   String            @map("belt_id")
+  challengerId             String            @map("challenger_id")
+  beltHolderId             String            @map("belt_holder_id")
+  status                   ChallengeStatus   @default(PENDING)
+  entryFee                 Int               @default(0) @map("entry_fee")
+  coinReward               Int               @default(0) @map("coin_reward")
+  response                 ChallengeStatus?
+  respondedAt              DateTime?         @map("responded_at")
+  declineCount             Int               @default(0) @map("decline_count")
+  debateId                 String?           @unique @map("debate_id")
+  challengerElo            Int               @map("challenger_elo")
+  holderElo                Int               @map("holder_elo")
+  eloDifference            Int               @map("elo_difference")
+  expiresAt                DateTime          @map("expires_at")
+  createdAt                DateTime          @default(now()) @map("created_at")
+  updatedAt                DateTime          @updatedAt @map("updated_at")
+  usesFreeChallenge        Boolean           @default(false) @map("uses_free_challenge")
+  debateAllowCopyPaste     Boolean?          @map("debate_allow_copy_paste")
+  debateCategory           String?           @map("debate_category")
+  debateChallengerPosition String?           @map("debate_challenger_position")
+  debateDescription        String?           @map("debate_description")
+  debateRoundDuration      Int?              @map("debate_round_duration")
+  debateSpeedMode          Boolean?          @map("debate_speed_mode")
+  debateTopic              String?           @map("debate_topic")
+  debateTotalRounds        Int?              @map("debate_total_rounds")
+  beltHolder               User              @relation("BeltHolderChallenge", fields: [beltHolderId], references: [id])
+  belt                     Belt              @relation(fields: [beltId], references: [id], onDelete: Cascade)
+  challenger               User              @relation("BeltChallenger", fields: [challengerId], references: [id])
+  debate                   Debate?           @relation("BeltChallengeDebate", fields: [debateId], references: [id])
+  coinTransactions         CoinTransaction[] @relation("CoinTransactionChallenge")
+
+  @@index([beltId])
+  @@index([challengerId])
+  @@index([beltHolderId])
+  @@index([status])
+  @@index([debateId])
+  @@index([expiresAt, status]) // Cron job to find expired challenges
+  @@index([beltId, status]) // Get pending challenges for a belt
+  @@map("belt_challenges")
+}
+
+model BeltSettings {
+  id                       String   @id @default(uuid())
+  beltType                 BeltType @unique @map("belt_type")
+  defensePeriodDays        Int      @default(30) @map("defense_period_days")
+  inactivityDays           Int      @default(30) @map("inactivity_days")
+  mandatoryDefenseDays     Int      @default(60) @map("mandatory_defense_days")
+  gracePeriodDays          Int      @default(30) @map("grace_period_days")
+  maxDeclines              Int      @default(2) @map("max_declines")
+  challengeCooldownDays    Int      @default(7) @map("challenge_cooldown_days")
+  challengeExpiryDays      Int      @default(3) @map("challenge_expiry_days")
+  eloRange                 Int      @default(200) @map("elo_range")
+  activityRequirementDays  Int      @default(30) @map("activity_requirement_days")
+  winStreakBonusMultiplier Float    @default(1.2) @map("win_streak_bonus_multiplier")
+  entryFeeBase             Int      @default(100) @map("entry_fee_base")
+  entryFeeMultiplier       Float    @default(1.0) @map("entry_fee_multiplier")
+  winnerRewardPercent      Int      @default(60) @map("winner_reward_percent")
+  loserConsolationPercent  Int      @default(30) @map("loser_consolation_percent")
+  platformFeePercent       Int      @default(10) @map("platform_fee_percent")
+  tournamentBeltCostSmall  Int      @default(500) @map("tournament_belt_cost_small")
+  tournamentBeltCostMedium Int      @default(1000) @map("tournament_belt_cost_medium")
+  tournamentBeltCostLarge  Int      @default(2000) @map("tournament_belt_cost_large")
+  inactiveCompetitorCount  Int      @default(2) @map("inactive_competitor_count")
+  inactiveAcceptDays       Int      @default(7) @map("inactive_accept_days")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+  updatedBy                String?  @map("updated_by")
+  require_coins            Boolean? @default(false)
+  require_free_challenge   Boolean? @default(false)
+  allow_free_challenges    Boolean? @default(true)
+  freeChallengesPerWeek    Int?     @default(1) @map("free_challenges_per_week")
+  requireCoinsForChallenge Boolean  @default(true) @map("require_coins_for_challenge")
+
+  @@map("belt_settings")
+}
+
+model CoinTransaction {
+  id              String                @id @default(uuid())
+  userId          String                @map("user_id")
+  type            CoinTransactionType   @map("type")
+  status          CoinTransactionStatus @default(COMPLETED) @map("status")
+  amount          Int
+  balanceAfter    Int                   @map("balance_after")
+  beltChallengeId String?               @map("belt_challenge_id")
+  beltId          String?               @map("belt_id")
+  tournamentId    String?               @map("tournament_id")
+  debateId        String?               @map("debate_id")
+  description     String?
+  metadata        Json?
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  beltChallenge   BeltChallenge?        @relation("CoinTransactionChallenge", fields: [beltChallengeId], references: [id])
+  belt            Belt?                 @relation("CoinTransactionBelt", fields: [beltId], references: [id])
+  user            User                  @relation("CoinTransactionUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@index([beltChallengeId])
+  @@map("coin_transactions")
+}
+
+enum AdvertiserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+  BANNED
+}
+
+enum CampaignType {
+  PLATFORM_ADS
+  CREATOR_SPONSORSHIP
+  TOURNAMENT_SPONSORSHIP
+}
+
+enum CampaignStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  PENDING_PAYMENT
+}
+
+enum PlacementType {
+  PROFILE_BANNER
+  POST_DEBATE
+  DEBATE_WIDGET
+  EMAIL_SHOUTOUT
+  DEBATE_SPONSORSHIP
+}
+
+enum PaymentType {
+  FLAT_RATE
+  PAY_PER_CLICK
+  PAY_PER_IMPRESSION
+  PERFORMANCE_BONUS
+  REVENUE_SHARE
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COUNTERED
+  EXPIRED
+}
+
+enum ContractStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum CreatorStatus {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum DebateCategory {
+  SPORTS
+  POLITICS
+  TECH
+  ENTERTAINMENT
+  SCIENCE
+  MUSIC
+  OTHER
+}
+
+enum DebatePosition {
+  FOR
+  AGAINST
+}
+
+enum DebateVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+enum DebateStatus {
+  WAITING
+  ACTIVE
+  COMPLETED
+  VERDICT_READY
+  APPEALED
+  CANCELLED
+}
+
+enum AppealStatus {
+  PENDING
+  PROCESSING
+  RESOLVED
+  DENIED
+}
+
+enum RematchStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum VerdictDecision {
+  CHALLENGER_WINS
+  OPPONENT_WINS
+  TIE
+}
+
+enum NotificationType {
+  DEBATE_TURN
+  DEBATE_ACCEPTED
+  ROUND_ENDING
+  VERDICT_READY
+  DEBATE_WON
+  DEBATE_LOST
+  DEBATE_TIED
+  NEW_CHALLENGE
+  OPPONENT_SUBMITTED
+  DEBATE_INVITATION
+  DEBATE_GROUP_INVITATION
+  REMATCH_REQUESTED
+  REMATCH_ACCEPTED
+  REMATCH_DECLINED
+  NEW_MESSAGE
+  BELT_CHALLENGE
+  BELT_CHALLENGE_ACCEPTED
+  BELT_MANDATORY_DEFENSE
+  BELT_INACTIVE
+  BELT_TRANSFER
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum TournamentStatus {
+  UPCOMING
+  REGISTRATION_OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TournamentFormat {
+  BRACKET
+  CHAMPIONSHIP
+  KING_OF_THE_HILL
+}
+
+enum ReseedMethod {
+  ELO_BASED
+  TOURNAMENT_WINS
+  RANDOM
+}
+
+enum ParticipantStatus {
+  REGISTERED
+  ACTIVE
+  ELIMINATED
+  DISQUALIFIED
+}
+
+enum RoundStatus {
+  UPCOMING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  FORFEITED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+enum BeltType {
+  ROOKIE
+  CATEGORY
+  CHAMPIONSHIP
+  UNDEFEATED
+  TOURNAMENT
+}
+
+enum BeltStatus {
+  ACTIVE
+  INACTIVE
+  VACANT
+  STAKED
+  GRACE_PERIOD
+  MANDATORY
+}
+
+enum ChallengeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  CANCELLED
+  COMPLETED
+}
+
+enum BeltTransferReason {
+  DEBATE_WIN
+  TOURNAMENT_WIN
+  MANDATORY_LOSS
+  INACTIVITY
+  ADMIN_TRANSFER
+  CHALLENGE_WIN
+  FORFEIT
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SupportTicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+enum CoinTransactionType {
+  BELT_CHALLENGE_ENTRY
+  BELT_CHALLENGE_REWARD
+  BELT_CHALLENGE_CONSOLATION
+  BELT_TOURNAMENT_CREATION
+  BELT_TOURNAMENT_REWARD
+  ADMIN_GRANT
+  ADMIN_DEDUCT
+  REFUND
+  PLATFORM_FEE
+  COIN_PURCHASE
+  COIN_PURCHASE_REFUND
+  DAILY_LOGIN_REWARD
+  ONBOARDING_REWARD
+  DEBATE_STREAK_REWARD
+}
+
+enum CoinTransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model SeoAudit {
+  id               String   @id @default(uuid())
+  overallScore     Int      @map("overall_score")
+  technicalScore   Int      @map("technical_score")
+  contentScore     Int      @map("content_score")
+  performanceScore Int      @map("performance_score")
+  geoScore         Int      @map("geo_score")
+  totalIssues      Int      @default(0) @map("total_issues")
+  criticalIssues   Int      @default(0) @map("critical_issues")
+  warningIssues    Int      @default(0) @map("warning_issues")
+  infoIssues       Int      @default(0) @map("info_issues")
+  results          Json
+  runBy            String?  @map("run_by")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("seo_audits")
+}
+
+model SeoRecommendation {
+  id          String    @id @default(uuid())
+  category    String
+  severity    String
+  title       String
+  description String
+  impact      String?
+  effort      String?
+  status      String    @default("pending")
+  pageUrl     String?   @map("page_url")
+  metadata    Json?
+  auditId     String?   @map("audit_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  resolvedAt  DateTime? @map("resolved_at")
+  resolvedBy  String?   @map("resolved_by")
+
+  @@index([category])
+  @@index([status])
+  @@index([severity])
+  @@map("seo_recommendations")
+}
