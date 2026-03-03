@@ -79,7 +79,7 @@ export async function sendYourTurnPushNotification(
       {
         title: "It's Your Turn!",
         body: `Your opponent submitted their argument in "${debateTopic}"`,
-        icon: '/favicon.ico',
+        icon: '/icon-192.png',
         data: {
           type: 'DEBATE_TURN',
           debateId,
@@ -143,7 +143,7 @@ export async function sendPushNotificationForNotification(
       {
         title,
         body: message,
-        icon: '/favicon.ico',
+        icon: '/icon-192.png',
         data: {
           type: notificationType,
           debateId: debateId || undefined,

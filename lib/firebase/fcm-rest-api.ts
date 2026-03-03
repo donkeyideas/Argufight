@@ -132,8 +132,8 @@ export async function sendPushNotificationREST(
           notification: {
             title: payload.title,
             body: payload.body,
-            icon: payload.icon || '/favicon.ico',
-            badge: payload.badge || '/favicon.ico',
+            icon: payload.icon || '/icon-192.png',
+            badge: payload.badge || '/icon-192.png',
           },
           fcmOptions: {
             link: payload.data?.url || '/',

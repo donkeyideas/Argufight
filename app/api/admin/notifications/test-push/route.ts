@@ -70,7 +70,7 @@ export async function POST() {
     const result = await sendPushNotifications(subscriptions, {
       title: 'Test Push Notification',
       body: `This is a test from ArguFight admin panel. Sent at ${new Date().toLocaleTimeString()}.`,
-      icon: '/favicon.ico',
+      icon: '/icon-192.png',
       data: { type: 'TEST', url: '/admin/notifications' },
     })
 
