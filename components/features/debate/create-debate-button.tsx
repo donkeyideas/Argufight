@@ -20,7 +20,7 @@ interface Props {
   label?: string;
   prefillTopic?: string;
   className?: string;
-  variant?: 'dashed' | 'accent';
+  variant?: 'dashed' | 'accent' | 'fab';
 }
 
 export function CreateDebateButton({ label = 'Start a debate', prefillTopic = '', className, variant = 'dashed' }: Props) {
@@ -75,7 +75,18 @@ export function CreateDebateButton({ label = 'Start a debate', prefillTopic = ''
 
   return (
     <>
-      {variant === 'accent' ? (
+      {variant === 'fab' ? (
+        <button
+          onClick={handleOpen}
+          className={cn(
+            'w-12 h-12 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg shadow-[rgba(212,240,80,0.25)] active:scale-95 transition-transform cursor-pointer',
+            className
+          )}
+          aria-label="Start a debate"
+        >
+          <span className="text-[28px] font-[300] leading-none">+</span>
+        </button>
+      ) : variant === 'accent' ? (
         <button
           onClick={handleOpen}
           className={cn(

@@ -6,6 +6,7 @@ import { ProfilePanelSkeleton } from '@/components/layout/profile-panel-skeleton
 import { RankingsPanel } from '@/components/layout/rankings-panel';
 import { RankingsPanelSkeleton } from '@/components/layout/rankings-panel-skeleton';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
+import { CreateDebateButton } from '@/components/features/debate/create-debate-button';
 import { Providers } from '@/lib/providers';
 import { getSession } from '@/lib/auth/get-session';
 
@@ -62,6 +63,11 @@ export default async function AppLayout({
               <RankingsPanel userId={session.userId} />
             </Suspense>
           </div>
+        </div>
+
+        {/* Mobile FAB — create debate */}
+        <div className="fixed right-4 bottom-20 z-50 lg:hidden">
+          <CreateDebateButton variant="fab" />
         </div>
 
         {/* Mobile bottom tab bar */}
