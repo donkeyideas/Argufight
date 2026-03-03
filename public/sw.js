@@ -13,8 +13,8 @@ self.addEventListener('push', function (event) {
   const title = payload.title || 'ArguFight'
   const options = {
     body: payload.body || '',
-    icon: payload.icon || '/favicon.ico',
-    badge: payload.badge || '/favicon.ico',
+    icon: payload.icon || '/icon-192.png',
+    badge: payload.badge || '/icon-192.png',
     data: payload.data || {},
     tag: (payload.data && payload.data.type) || 'default',
     renotify: true,
