@@ -47,19 +47,19 @@ export function Topnav({ user }: TopnavProps) {
     : 'U';
 
   return (
-    <header className="sticky top-0 z-50 flex items-center h-[58px] px-8 border-b border-border bg-bg">
+    <header className="sticky top-0 z-50 flex items-center h-[52px] lg:h-[58px] px-4 lg:px-8 border-b border-border bg-bg">
       {/* Logo */}
       <Link
         href="/dashboard"
-        className="flex-shrink-0 text-[19px] font-[300] uppercase text-text mr-auto"
+        className="flex-shrink-0 text-[17px] lg:text-[19px] font-[300] uppercase text-text mr-auto"
         style={{ letterSpacing: '4px' }}
       >
         Argu<strong className="font-[600] text-accent">fight</strong>
       </Link>
 
-      {/* Pill nav — absolutely centered */}
+      {/* Pill nav — hidden on mobile, absolutely centered on desktop */}
       <nav
-        className="flex gap-[2px] bg-surface border border-border rounded-[20px] p-[3px] absolute left-1/2 -translate-x-1/2"
+        className="hidden lg:flex gap-[2px] bg-surface border border-border rounded-[20px] p-[3px] absolute left-1/2 -translate-x-1/2"
         aria-label="Main navigation"
       >
         {pillNav.map((item) => (
@@ -79,19 +79,21 @@ export function Topnav({ user }: TopnavProps) {
       </nav>
 
       {/* Right: coins + notifications + avatar */}
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-2 lg:gap-3 ml-auto">
         {/* Coins */}
         {user && (
           <Link
             href="/upgrade"
-            className="text-[14px] font-[500] text-[var(--amber)] tracking-[0.3px] border border-[rgba(255,207,77,0.2)] rounded-[20px] px-3 py-1 bg-[rgba(255,207,77,0.05)] hover:border-[rgba(255,207,77,0.4)] transition-colors"
+            className="text-[13px] lg:text-[14px] font-[500] text-[var(--amber)] tracking-[0.3px] border border-[rgba(255,207,77,0.2)] rounded-[20px] px-2.5 lg:px-3 py-1 bg-[rgba(255,207,77,0.05)] hover:border-[rgba(255,207,77,0.4)] transition-colors"
           >
             {user.coins.toLocaleString()} coins
           </Link>
         )}
 
-        {/* Theme toggle */}
-        <ThemeToggle />
+        {/* Theme toggle — hidden on mobile to save space */}
+        <div className="hidden sm:block">
+          <ThemeToggle />
+        </div>
 
         {/* Notifications */}
         <NotificationBell />

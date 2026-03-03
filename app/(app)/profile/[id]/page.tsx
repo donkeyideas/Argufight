@@ -76,7 +76,7 @@ export default async function ProfilePage({ params }: Props) {
   const memberSince = new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
-    <div className="px-7 py-6 max-w-3xl mx-auto">
+    <div className="px-4 py-5 lg:px-7 lg:py-6 max-w-3xl mx-auto">
       {/* Profile header */}
       <Card padding="lg" className="mb-6">
         <div className="flex items-start gap-5">

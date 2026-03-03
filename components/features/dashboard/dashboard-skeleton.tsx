@@ -9,7 +9,7 @@ function Bone({ w, h = 14, className = '' }: { w?: string; h?: number; className
 
 export function DashboardSkeleton() {
   return (
-    <div className="px-7 py-6 min-w-0">
+    <div className="px-4 py-5 lg:px-7 lg:py-6 min-w-0">
 
       {/* ── Daily Challenge ── */}
       <div className="mb-8 pb-8 border-b border-border">

@@ -5,6 +5,7 @@ import { ProfilePanel } from '@/components/layout/profile-panel';
 import { ProfilePanelSkeleton } from '@/components/layout/profile-panel-skeleton';
 import { RankingsPanel } from '@/components/layout/rankings-panel';
 import { RankingsPanelSkeleton } from '@/components/layout/rankings-panel-skeleton';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { Providers } from '@/lib/providers';
 import { getSession } from '@/lib/auth/get-session';
 
@@ -36,31 +37,35 @@ export default async function AppLayout({
           }}
         />
 
-        {/* 3-column shell — sticky panels, scrollable center */}
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: '220px 1fr 220px' }}
-        >
-          {/* Left: Profile panel — streams in independently */}
-          <Suspense fallback={<ProfilePanelSkeleton />}>
-            <ProfilePanel userId={session.userId} />
-          </Suspense>
+        {/* Responsive shell: single column on mobile, 3-column on lg+ */}
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_220px]">
+          {/* Left: Profile panel — hidden on mobile */}
+          <div className="hidden lg:block">
+            <Suspense fallback={<ProfilePanelSkeleton />}>
+              <ProfilePanel userId={session.userId} />
+            </Suspense>
+          </div>
 
           {/* Center: page content */}
           <main
             id="main-content"
             tabIndex={-1}
-            className="min-w-0 overflow-x-hidden overflow-y-auto"
+            className="min-w-0 overflow-x-hidden overflow-y-auto pb-16 lg:pb-0"
             style={{ minHeight: 'calc(100vh - 58px)' }}
           >
             {children}
           </main>
 
-          {/* Right: Rankings / Belts / Tournaments — streams in independently */}
-          <Suspense fallback={<RankingsPanelSkeleton />}>
-            <RankingsPanel userId={session.userId} />
-          </Suspense>
+          {/* Right: Rankings panel — hidden on mobile */}
+          <div className="hidden lg:block">
+            <Suspense fallback={<RankingsPanelSkeleton />}>
+              <RankingsPanel userId={session.userId} />
+            </Suspense>
+          </div>
         </div>
+
+        {/* Mobile bottom tab bar */}
+        <MobileBottomNav />
       </div>
     </Providers>
   );

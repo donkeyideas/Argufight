@@ -237,7 +237,7 @@ export async function DashboardContent({ userId }: { userId: string }) {
   const headBold  = words.slice(splitAt).join(' ');
 
   return (
-    <div className="px-7 py-6 min-w-0">
+    <div className="px-4 py-5 lg:px-7 lg:py-6 min-w-0">
 
       {/* ── User Alerts — stream in independently ──────── */}
       <Suspense fallback={<AlertsSkeleton />}>
