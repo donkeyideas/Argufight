@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { unstable_cache } from 'next/cache';
+import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/cn';
 import { CreateDebateButton } from '@/components/features/debate/create-debate-button';
@@ -63,7 +64,7 @@ const getProfileData = unstable_cache(
     return { user, recentDebates, userRank };
   },
   ['profile-panel'],
-  { revalidate: 30 }
+  { revalidate: 120 }
 );
 
 export async function ProfilePanel({ userId }: Props) {
@@ -86,8 +87,7 @@ export async function ProfilePanel({ userId }: Props) {
         {/* Avatar */}
         <div className="w-10 h-10 rounded-full border border-border-2 bg-surface-2 flex items-center justify-center text-[17px] font-[600] text-text-2 mb-3 overflow-hidden">
           {user.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+            <Image src={user.avatarUrl} alt={user.username} width={40} height={40} className="w-full h-full object-cover" />
           ) : (
             initials
           )}

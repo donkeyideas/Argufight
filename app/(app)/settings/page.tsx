@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db/prisma';
 import { getSession } from '@/lib/auth/get-session';
+
+export const dynamic = 'force-dynamic';
 import {
   ProfileForm,
   PasswordForm,

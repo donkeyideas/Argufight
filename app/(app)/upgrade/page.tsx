@@ -10,6 +10,7 @@ import { CheckCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 export const metadata: Metadata = { title: 'Upgrade' };
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 const TIERS = [

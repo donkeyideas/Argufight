@@ -54,7 +54,7 @@ const getRankingsData = unstable_cache(
     return { leaderboard, belts, tournaments, userRank };
   },
   ['rankings-panel-v2'],
-  { revalidate: 60 }
+  { revalidate: 180 }
 );
 
 export async function RankingsPanel({ userId }: Props) {

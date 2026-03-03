@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Eye, MessageSquare, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = { title: 'Trending' };
+export const dynamic = 'force-dynamic';
 export const revalidate = 120;
 
 export default async function TrendingPage() {

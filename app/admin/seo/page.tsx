@@ -12,14 +12,14 @@ function TabLoading() {
   );
 }
 
-const OverviewTab        = dynamic(() => import('./components/OverviewTab'),        { ssr: false, loading: TabLoading });
-const SearchConsoleTab   = dynamic(() => import('./components/SearchConsoleTab'),   { ssr: false, loading: TabLoading });
-const AuditTab           = dynamic(() => import('./components/AuditTab'),           { ssr: false, loading: TabLoading });
-const GEOTab             = dynamic(() => import('./components/GEOTab'),             { ssr: false, loading: TabLoading });
-const AEOTab             = dynamic(() => import('./components/AEOTab'),             { ssr: false, loading: TabLoading });
-const CROTab             = dynamic(() => import('./components/CROTab'),             { ssr: false, loading: TabLoading });
-const RecommendationsTab = dynamic(() => import('./components/RecommendationsTab'), { ssr: false, loading: TabLoading });
-const SettingsTab        = dynamic(() => import('./components/SettingsTab'),        { ssr: false, loading: TabLoading });
+const OverviewTab        = dynamic(() => import('./components/OverviewTab'),        { loading: TabLoading });
+const SearchConsoleTab   = dynamic(() => import('./components/SearchConsoleTab'),   { loading: TabLoading });
+const AuditTab           = dynamic(() => import('./components/AuditTab'),           { loading: TabLoading });
+const GEOTab             = dynamic(() => import('./components/GEOTab'),             { loading: TabLoading });
+const AEOTab             = dynamic(() => import('./components/AEOTab'),             { loading: TabLoading });
+const CROTab             = dynamic(() => import('./components/CROTab'),             { loading: TabLoading });
+const RecommendationsTab = dynamic(() => import('./components/RecommendationsTab'), { loading: TabLoading });
+const SettingsTab        = dynamic(() => import('./components/SettingsTab'),        { loading: TabLoading });
 
 const TABS = [
   { key: 'overview',         label: 'Overview' },
