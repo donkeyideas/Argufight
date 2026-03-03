@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FollowButton } from '@/components/features/profile/follow-button';
 import { MessageButton } from '@/components/features/profile/message-button';
+import { ChallengeButton } from '@/app/(app)/leaderboard/challenge-button';
 import Link from 'next/link';
 import { Swords, Award, CheckCircle, XCircle, Minus } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -85,7 +86,6 @@ export default async function ProfilePage({ params }: Props) {
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <h1 className="text-[24px] font-[600] text-text leading-tight">{user.username}</h1>
               {user.isAdmin && <Badge color="accent">Admin</Badge>}
-              {user.isAI && <Badge color="blue">AI</Badge>}
               {user.isCreator && <Badge color="amber">Creator</Badge>}
               {user.isBanned && <Badge color="red">Banned</Badge>}
             </div>
@@ -109,10 +109,7 @@ export default async function ProfilePage({ params }: Props) {
                   currentUserId={session?.userId ?? null}
                 />
                 <MessageButton targetId={id} />
-                <Button variant="secondary" size="sm">
-                  <Swords size={13} />
-                  Challenge
-                </Button>
+                <ChallengeButton opponentId={id} opponentName={user.username} />
               </>
             )}
           </div>
