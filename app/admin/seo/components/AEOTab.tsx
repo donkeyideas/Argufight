@@ -10,7 +10,7 @@ interface AeoData {
   hasLlmsTxt: boolean;
   contentStats: {
     totalPosts: number; withMetaTitle: number; withMetaDesc: number;
-    withTags: number; withCategory: number; withFeaturedImage: number; longFormPosts: number;
+    withTags: number; withFeaturedImage: number; longFormPosts: number;
   };
   debateStats: { total: number; completed: number };
   checklist: { label: string; done: boolean }[];

@@ -17,10 +17,11 @@ export async function GET() {
           title: true,
           metaTitle: true,
           metaDescription: true,
-          tags: true,
-          category: true,
-          featuredImageUrl: true,
+          keywords: true,
+          featuredImageId: true,
           content: true,
+          tags: { select: { id: true } },
+          categories: { select: { categoryId: true } },
         },
       }),
       prisma.debate.count(),
@@ -31,9 +32,9 @@ export async function GET() {
     const totalPosts         = posts.length
     const withMetaTitle      = posts.filter((p) => p.metaTitle && p.metaTitle.trim()).length
     const withMetaDesc       = posts.filter((p) => p.metaDescription && p.metaDescription.trim()).length
-    const withTags           = posts.filter((p) => Array.isArray(p.tags) ? p.tags.length > 0 : false).length
-    const withCategory       = posts.filter((p) => p.category).length
-    const withFeaturedImage  = posts.filter((p) => p.featuredImageUrl).length
+    const withTags           = posts.filter((p) => (p.tags?.length ?? 0) > 0 || (p.keywords && p.keywords.trim())).length
+    const withCategory       = posts.filter((p) => (p.categories?.length ?? 0) > 0).length
+    const withFeaturedImage  = posts.filter((p) => p.featuredImageId).length
     const longFormPosts      = posts.filter((p) => (p.content?.length ?? 0) > 2000).length
     const hasLlmsTxt         = !!(llmsSetting?.value && llmsSetting.value.trim())
 
@@ -100,7 +101,7 @@ export async function GET() {
     return NextResponse.json({
       aeoScore: score,
       hasLlmsTxt,
-      contentStats: { totalPosts, withMetaTitle, withMetaDesc, withTags, withCategory, withFeaturedImage, longFormPosts },
+      contentStats: { totalPosts, withMetaTitle, withMetaDesc, withTags, withFeaturedImage, longFormPosts },
       debateStats: { total: debateCount, completed: completedDebateCount },
       checklist,
       recommendations,
