@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -210,18 +210,29 @@ export function TwoFactorCard({ totpEnabled }: { totpEnabled: boolean }) {
 // ─── Notification Preferences ────────────────────────────────────────────────
 
 const NOTIF_PREFS = [
-  { key: 'emailOnChallenge',  label: 'Debate challenges',  desc: 'When someone challenges you' },
-  { key: 'emailOnVerdict',    label: 'Verdict ready',      desc: 'When a debate verdict is in' },
-  { key: 'emailOnMessage',    label: 'New messages',       desc: 'When you receive a direct message' },
-  { key: 'emailOnFollow',     label: 'New followers',      desc: 'When someone follows you' },
+  { key: 'emailOnChallenge', label: 'Debate challenges', desc: 'When someone challenges you' },
+  { key: 'emailOnVerdict',   label: 'Verdict ready',     desc: 'When a debate verdict is in' },
+  { key: 'emailOnMessage',   label: 'New messages',      desc: 'When you receive a direct message' },
+  { key: 'emailOnFollow',    label: 'New followers',     desc: 'When someone follows you' },
 ];
 
+const DEFAULT_PREFS = Object.fromEntries(NOTIF_PREFS.map((p) => [p.key, true]));
+
 export function NotificationsCard() {
-  const [prefs, setPrefs] = useState<Record<string, boolean>>(
-    Object.fromEntries(NOTIF_PREFS.map((p) => [p.key, true]))
-  );
-  const [saving, setSaving] = useState(false);
-  const { success, error } = useToast();
+  const [prefs, setPrefs]     = useState<Record<string, boolean>>(DEFAULT_PREFS);
+  const [loaded, setLoaded]   = useState(false);
+  const [saving, setSaving]   = useState(false);
+  const { success, error }    = useToast();
+
+  useEffect(() => {
+    fetch('/api/user/notifications')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.prefs) setPrefs(data.prefs);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
 
   async function handleSave() {
     setSaving(true);
@@ -232,7 +243,7 @@ export function NotificationsCard() {
         body: JSON.stringify(prefs),
       });
       if (res.ok) success('Preferences saved');
-      else error('Failed to save');
+      else error('Failed to save preferences');
     } finally {
       setSaving(false);
     }
@@ -244,28 +255,35 @@ export function NotificationsCard() {
         <Bell size={14} className="text-text-3" />
         <h2 className="text-sm font-[500] text-text">Notifications</h2>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-5">
         {NOTIF_PREFS.map((pref) => (
-          <div key={pref.key} className="flex items-center justify-between">
-            <div>
+          <div key={pref.key} className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
               <p className="text-xs font-[450] text-text">{pref.label}</p>
-              <p className="text-[13px] text-text-3">{pref.desc}</p>
+              <p className="text-[13px] text-text-3 mt-0.5">{pref.desc}</p>
             </div>
             <button
+              role="switch"
+              aria-checked={prefs[pref.key]}
               onClick={() => setPrefs((p) => ({ ...p, [pref.key]: !p[pref.key] }))}
-              className={`relative h-5 w-9 rounded-full transition-colors ${
-                prefs[pref.key] ? 'bg-accent' : 'bg-surface-3'
-              }`}
+              disabled={!loaded}
+              className={[
+                'relative flex-shrink-0 h-[22px] w-10 rounded-full border transition-colors duration-200 cursor-pointer disabled:opacity-40',
+                prefs[pref.key]
+                  ? 'bg-accent border-accent'
+                  : 'bg-surface-2 border-border hover:border-border-2',
+              ].join(' ')}
             >
-              <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-bg transition-transform ${
-                prefs[pref.key] ? 'translate-x-4' : 'translate-x-0.5'
-              }`} />
+              <span className={[
+                'absolute top-[2px] h-[16px] w-[16px] rounded-full shadow-sm transition-transform duration-200',
+                prefs[pref.key] ? 'translate-x-[20px] bg-bg' : 'translate-x-[2px] bg-text-3',
+              ].join(' ')} />
             </button>
           </div>
         ))}
       </div>
-      <Separator className="my-4" />
-      <Button variant="accent" size="sm" onClick={handleSave} loading={saving}>
+      <Separator className="my-5" />
+      <Button variant="accent" size="sm" onClick={handleSave} loading={saving} disabled={!loaded}>
         Save preferences
       </Button>
     </Card>
