@@ -4,7 +4,7 @@
     { "path": "/api/cron/expire-offers",            "schedule": "0 1 * * *" },
     { "path": "/api/cron/process-escrow",           "schedule": "0 2 * * *" },
     { "path": "/api/cron/process-ad-tasks",         "schedule": "0 3 * * *" },
-    { "path": "/api/cron/ai-tasks",                 "schedule": "0 */4 * * *" },
+    { "path": "/api/cron/ai-tasks",                 "schedule": "0 4 * * *" },
     { "path": "/api/cron/tournament-auto-start",    "schedule": "0 5 * * *" },
     { "path": "/api/cron/tournament-progression",   "schedule": "0 6 * * *" },
     { "path": "/api/cron/social-posts",             "schedule": "0 9 * * *" }
