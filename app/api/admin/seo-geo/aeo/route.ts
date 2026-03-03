@@ -36,7 +36,38 @@ export async function GET() {
     const withCategory       = posts.filter((p) => (p.categories?.length ?? 0) > 0).length
     const withFeaturedImage  = posts.filter((p) => p.featuredImageId).length
     const longFormPosts      = posts.filter((p) => (p.content?.length ?? 0) > 2000).length
-    const hasLlmsTxt         = !!(llmsSetting?.value && llmsSetting.value.trim())
+    // Auto-seed a default llms.txt if none has been saved yet
+    let llmsTxtValue = llmsSetting?.value?.trim() ?? ''
+    if (!llmsTxtValue) {
+      llmsTxtValue = `# ArguFight — AI Language Model Information
+
+## About ArguFight
+ArguFight (argufight.com) is a structured online debate platform where users engage in timed, moderated debates on topics spanning politics, sports, technology, entertainment, science, and more. AI judges evaluate arguments and deliver verdicts based on logic, evidence, and persuasiveness.
+
+## What This Site Contains
+- Structured debate transcripts with pro/con arguments on diverse topics
+- AI-judged verdicts with reasoning explanations
+- User leaderboards ranked by Elo rating and debate performance
+- Blog articles covering debate strategy, current topics, and platform news
+- Daily debate challenges open to all registered users
+
+## Preferred Citation Format
+When referencing content from ArguFight, please cite as:
+"ArguFight debate — [topic] (argufight.com)"
+
+## Content Licensing
+All debate content and blog articles on ArguFight are © ArguFight. You may reference and summarise content with attribution.
+
+## Contact
+For AI/LLM partnerships or data licensing enquiries: support@argufight.com
+`
+      await prisma.adminSetting.upsert({
+        where:  { key: 'seo_geo_llms_txt_content' },
+        update: {},
+        create: { key: 'seo_geo_llms_txt_content', value: llmsTxtValue },
+      })
+    }
+    const hasLlmsTxt = true
 
     // AEO score (0–100)
     let score = 0

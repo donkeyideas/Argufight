@@ -107,10 +107,10 @@ export async function GET() {
       { page: 'Homepage',      cta: 'Join Discussion',       priority: 'high',   status: 'live' },
       { page: 'Dashboard',     cta: 'Start a debate',        priority: 'high',   status: 'live' },
       { page: 'Dashboard',     cta: 'Daily Challenge',       priority: 'high',   status: 'live' },
-      { page: 'Leaderboard',   cta: 'Challenge top debater', priority: 'medium', status: 'missing' },
+      { page: 'Leaderboard',   cta: 'Challenge top debater', priority: 'medium', status: 'live' },
       { page: 'Debate result', cta: 'Rematch',               priority: 'medium', status: 'live' },
       { page: 'Upgrade page',  cta: 'Subscribe',             priority: 'high',   status: 'live' },
-      { page: 'Post-signup',   cta: 'Start first debate',    priority: 'high',   status: 'missing' },
+      { page: 'Post-signup',   cta: 'Start first debate',    priority: 'high',   status: 'live' },
     ]
 
     return NextResponse.json({
