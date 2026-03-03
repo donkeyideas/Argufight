@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/cn';
 import Link from 'next/link';
-import { Trophy, TrendingUp, Swords } from 'lucide-react';
+import { Trophy, TrendingUp, Swords, Bot } from 'lucide-react';
 import { ChallengeButton } from './challenge-button';
 
 export const metadata: Metadata = { title: 'Leaderboard' };
@@ -18,11 +18,11 @@ export const dynamic = 'force-dynamic';
 async function LeaderboardData({ userId }: { userId: string }) {
   const [topPlayers, userRankData] = await Promise.all([
     prisma.user.findMany({
-      where: { isAI: false, isBanned: false },
+      where: { isBanned: false },
       orderBy: { eloRating: 'desc' },
       take: 100,
       select: {
-        id: true, username: true, avatarUrl: true,
+        id: true, username: true, avatarUrl: true, isAI: true,
         eloRating: true, debatesWon: true, debatesLost: true, debatesTied: true,
         consecutiveLoginDays: true,
       },
@@ -67,7 +67,10 @@ async function LeaderboardData({ userId }: { userId: string }) {
                 </span>
                 <Avatar src={player.avatarUrl} fallback={player.username} size="md" />
                 <div>
-                  <p className="text-xs font-[500] text-text">{player.username}</p>
+                  <p className="text-xs font-[500] text-text">
+                    {player.username}
+                    {player.isAI && <Bot size={11} className="inline ml-1 text-text-3" />}
+                  </p>
                   <p className="text-[13px] text-text-3 mt-0.5">{player.eloRating} ELO</p>
                 </div>
               </Link>
@@ -118,6 +121,7 @@ async function LeaderboardData({ userId }: { userId: string }) {
                       isCurrentUser ? 'text-accent' : 'text-text'
                     )}>
                       {player.username}
+                      {player.isAI && <Bot size={11} className="inline ml-1 text-text-3" />}
                       {isCurrentUser && <span className="text-text-3 font-[400] ml-1">(you)</span>}
                     </p>
                     <p className="text-[13px] text-text-3 mt-0.5">

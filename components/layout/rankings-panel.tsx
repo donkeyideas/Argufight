@@ -3,6 +3,7 @@ import { unstable_cache } from 'next/cache';
 import Link from 'next/link';
 import { cn } from '@/lib/cn';
 import { Avatar } from '@/components/ui/avatar';
+import { Bot } from 'lucide-react';
 import { CreateDebateButton } from '@/components/features/debate/create-debate-button';
 
 interface Props {
@@ -13,13 +14,14 @@ const getRankingsData = unstable_cache(
   async (userId: string) => {
     const [leaderboard, belts, tournaments] = await Promise.all([
       prisma.user.findMany({
-        where: { isAI: false, isBanned: false },
+        where: { isBanned: false },
         orderBy: { eloRating: 'desc' },
         take: 5,
         select: {
           id: true,
           username: true,
           avatarUrl: true,
+          isAI: true,
           eloRating: true,
           debatesWon: true,
           debatesLost: true,
@@ -46,7 +48,7 @@ const getRankingsData = unstable_cache(
     const currentUser = leaderboard.find((p) => p.id === userId);
     const userRank = currentUser
       ? (await prisma.user.count({
-          where: { eloRating: { gt: currentUser.eloRating }, isAI: false, isBanned: false },
+          where: { eloRating: { gt: currentUser.eloRating }, isBanned: false },
         })) + 1
       : null;
 
@@ -103,6 +105,7 @@ export async function RankingsPanel({ userId }: Props) {
                 size="sm"
                 className={isYou ? 'ring-1 ring-accent ring-offset-1 ring-offset-bg' : ''}
               />
+              {player.isAI && <Bot size={11} className="text-text-3 flex-shrink-0" />}
               <span className={cn('text-[15px] font-[500] flex-shrink-0 ml-auto', isYou ? 'text-accent' : 'text-[var(--amber)]')}>
                 {player.eloRating}
               </span>

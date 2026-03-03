@@ -56,7 +56,7 @@ const getProfileData = unstable_cache(
 
     const userRank = user
       ? (await prisma.user.count({
-          where: { eloRating: { gt: user.eloRating }, isAI: false, isBanned: false },
+          where: { eloRating: { gt: user.eloRating }, isBanned: false },
         })) + 1
       : null;
 
