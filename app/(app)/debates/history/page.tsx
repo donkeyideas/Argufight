@@ -50,7 +50,7 @@ export default async function DebateHistoryPage() {
           }
         />
       ) : (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-3">
           {debates.map((debate) => {
             const isChallenger = debate.challengerId === userId;
             const opponent = isChallenger ? debate.opponent : debate.challenger;
