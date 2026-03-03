@@ -180,7 +180,7 @@ async function publishLinkedIn(text: string): Promise<PublishResult> {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${SOCIAL_LINKEDIN_ACCESS_TOKEN}`,
-        'LinkedIn-Version': '202501',
+        'LinkedIn-Version': '202601',
         'X-Restli-Protocol-Version': '2.0.0',
       },
       body: JSON.stringify(body),
