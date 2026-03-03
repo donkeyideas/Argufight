@@ -20,8 +20,9 @@ export const dynamic = 'force-dynamic';
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
-function dayLabel(d: Date) {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+function dayLabel(d: Date | string) {
+  const date = typeof d === 'string' ? new Date(d) : d;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function buildDayBuckets(days: number): Map<string, number> {
@@ -172,7 +173,8 @@ async function ChartsSection() {
 
   const weekBuckets: Record<string, number> = { 'Week 1': 0, 'Week 2': 0, 'Week 3': 0, 'Week 4': 0 };
   for (const d of debates30) {
-    const daysAgo = Math.floor((now.getTime() - d.createdAt.getTime()) / (7 * 24 * 60 * 60 * 1000));
+    const createdAt = typeof d.createdAt === 'string' ? new Date(d.createdAt) : d.createdAt;
+    const daysAgo = Math.floor((now.getTime() - createdAt.getTime()) / (7 * 24 * 60 * 60 * 1000));
     const key = `Week ${Math.min(daysAgo + 1, 4)}`;
     weekBuckets[key] = (weekBuckets[key] ?? 0) + 1;
   }
