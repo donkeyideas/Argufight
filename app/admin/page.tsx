@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { prisma } from '@/lib/db/prisma';
 import { unstable_cache } from 'next/cache';
@@ -54,9 +55,9 @@ const getAdminStats = unstable_cache(
       prisma.debate.count(),
       prisma.debate.count({ where: { createdAt: { gte: dayAgo } } }),
       prisma.debate.count({ where: { status: 'ACTIVE' } }),
-      prisma.belt.count({ where: { status: 'ACTIVE' } }),
+      prisma.belt.count({ where: { status: 'ACTIVE' } }).catch(() => 0),
       prisma.report.count({ where: { status: 'PENDING' } }).catch(() => 0),
-      prisma.coinTransaction.aggregate({ _sum: { amount: true }, where: { type: 'COIN_PURCHASE' } }),
+      prisma.coinTransaction.aggregate({ _sum: { amount: true }, where: { type: 'COIN_PURCHASE' } }).catch(() => ({ _sum: { amount: null } })),
     ]);
 
     return { totalUsers, newUsersWeek, totalDebates, debatesToday, activeDebates, totalBelts, pendingModeration, totalRevenue };
@@ -325,9 +326,15 @@ export default function AdminOverviewPage() {
         </p>
       </div>
 
-      <StatsSection />
-      <ChartsSection />
-      <RecentSection />
+      <Suspense fallback={<StatsSkeleton />}>
+        <StatsSection />
+      </Suspense>
+      <Suspense fallback={<ChartsSkeleton />}>
+        <ChartsSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <RecentSection />
+      </Suspense>
     </div>
   );
 }

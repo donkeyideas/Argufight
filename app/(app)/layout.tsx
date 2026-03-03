@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { Topnav } from '@/components/layout/topnav';
 import { ProfilePanel } from '@/components/layout/profile-panel';
+import { ProfilePanelSkeleton } from '@/components/layout/profile-panel-skeleton';
 import { RankingsPanel } from '@/components/layout/rankings-panel';
+import { RankingsPanelSkeleton } from '@/components/layout/rankings-panel-skeleton';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { CreateDebateButton } from '@/components/features/debate/create-debate-button';
 import { Providers } from '@/lib/providers';
@@ -37,7 +40,9 @@ export default async function AppLayout({
         <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_220px]">
           {/* Left: Profile panel — hidden on mobile */}
           <div className="hidden lg:block">
-            <ProfilePanel userId={session.userId} />
+            <Suspense fallback={<ProfilePanelSkeleton />}>
+              <ProfilePanel userId={session.userId} />
+            </Suspense>
           </div>
 
           {/* Center: page content */}
@@ -52,7 +57,9 @@ export default async function AppLayout({
 
           {/* Right: Rankings panel — hidden on mobile */}
           <div className="hidden lg:block">
-            <RankingsPanel userId={session.userId} />
+            <Suspense fallback={<RankingsPanelSkeleton />}>
+              <RankingsPanel userId={session.userId} />
+            </Suspense>
           </div>
         </div>
 
