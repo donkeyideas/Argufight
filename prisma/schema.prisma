@@ -809,6 +809,7 @@ model Judge {
   emoji         String
   description   String
   systemPrompt  String       @map("system_prompt")
+  avatarUrl     String?      @map("avatar_url")
   debatesJudged Int          @default(0) @map("debates_judged")
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
