@@ -311,14 +311,14 @@ export function MessagesUI({ conversations: initialConversations, currentUserId,
 
               <form
                 onSubmit={handleSend}
-                className="border-t border-border p-4 flex-shrink-0 flex gap-2"
+                className="border-t border-border p-4 flex-shrink-0 flex flex-col gap-2"
               >
                 <Textarea
                   placeholder="Write a message..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  rows={2}
-                  className="flex-1 min-h-[72px] max-h-[140px] resize-none"
+                  rows={3}
+                  className="w-full min-h-[80px] max-h-[160px] resize-none"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
