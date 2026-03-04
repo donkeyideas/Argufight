@@ -157,6 +157,30 @@ export async function GET(request: NextRequest) {
           const wordCount = calculateWordCount(response)
           await updateUserAnalyticsOnStatement(aiUser.id, wordCount)
 
+          // Notify the human opponent it's their turn (push + in-app)
+          const humanOpponentId = debate.challengerId === aiUser.id ? debate.opponentId : debate.challengerId
+          if (humanOpponentId) {
+            // In-app notification (non-blocking)
+            prisma.notification.create({
+              data: {
+                userId: humanOpponentId,
+                type: 'DEBATE_TURN',
+                title: 'Your Turn to Argue',
+                message: `It's your turn in "${debate.topic}"`,
+                debateId: debate.id,
+              },
+            }).catch((error) => {
+              console.error('[AI Response Cron] Failed to create turn notification:', error)
+            })
+
+            // Push notification (non-blocking)
+            import('@/lib/notifications/push-notifications').then(({ sendYourTurnPushNotification }) => {
+              sendYourTurnPushNotification(humanOpponentId, debate.id, debate.topic).catch((error) => {
+                console.error('[AI Response Cron] Failed to send push notification:', error)
+              })
+            }).catch(() => {})
+          }
+
           // Check if both participants have submitted for this round
           const updatedChallengerStatement = await prisma.statement.findUnique({
             where: {

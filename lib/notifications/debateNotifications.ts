@@ -49,24 +49,33 @@ export async function notifyDebateWatchers(
       select: { userId: true },
     });
 
+    const filteredWatchers = watchers.filter((w) => w.userId !== excludeUserId);
+
     // Create notifications for all watchers except the one who triggered it
-    const notifications = watchers
-      .filter((w) => w.userId !== excludeUserId)
-      .map((watcher) => ({
-        id: crypto.randomUUID(),
-        userId: watcher.userId,
-        type: type as any,
-        title,
-        message,
-        debateId,
-        read: false,
-        createdAt: new Date(),
-      }));
+    const notifications = filteredWatchers.map((watcher) => ({
+      id: crypto.randomUUID(),
+      userId: watcher.userId,
+      type: type as any,
+      title,
+      message,
+      debateId,
+      read: false,
+      createdAt: new Date(),
+    }));
 
     if (notifications.length > 0) {
       await prisma.notification.createMany({
         data: notifications,
       });
+
+      // Send push notifications to all watchers (non-blocking)
+      for (const watcher of filteredWatchers) {
+        sendPushNotificationForNotification(watcher.userId, type, title, message, debateId).catch(
+          (error) => {
+            console.error('Failed to send push to watcher:', error);
+          }
+        );
+      }
     }
   } catch (error) {
     console.error('Failed to notify watchers:', error);
@@ -93,23 +102,32 @@ export async function notifyDebateParticipants(
       participants.push(debate.opponentId);
     }
 
-    const notifications = participants
-      .filter((userId) => userId !== excludeUserId)
-      .map((userId) => ({
-        id: crypto.randomUUID(),
-        userId,
-        type: type as any,
-        title,
-        message,
-        debateId,
-        read: false,
-        createdAt: new Date(),
-      }));
+    const filteredParticipants = participants.filter((userId) => userId !== excludeUserId);
+
+    const notifications = filteredParticipants.map((userId) => ({
+      id: crypto.randomUUID(),
+      userId,
+      type: type as any,
+      title,
+      message,
+      debateId,
+      read: false,
+      createdAt: new Date(),
+    }));
 
     if (notifications.length > 0) {
       await prisma.notification.createMany({
         data: notifications,
       });
+
+      // Send push notifications to all participants (non-blocking)
+      for (const userId of filteredParticipants) {
+        sendPushNotificationForNotification(userId, type, title, message, debateId).catch(
+          (error) => {
+            console.error('Failed to send push to participant:', error);
+          }
+        );
+      }
     }
   } catch (error) {
     console.error('Failed to notify participants:', error);

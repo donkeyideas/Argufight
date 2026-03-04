@@ -316,6 +316,25 @@ export async function POST(
             roundDeadline: newDeadline,
           },
         })
+
+        // Notify the other participant that the new round has started
+        if (debate.challengeType !== 'GROUP' && debate.opponentId) {
+          const otherParticipantId =
+            userId === debate.challengerId
+              ? debate.opponentId
+              : debate.challengerId
+
+          if (otherParticipantId) {
+            const { createDebateNotification } = await import('@/lib/notifications/debateNotifications')
+            await createDebateNotification(
+              id,
+              otherParticipantId,
+              'DEBATE_TURN',
+              "It's Your Turn",
+              `Round ${debate.currentRound + 1} has started. It's your turn to submit an argument.`
+            )
+          }
+        }
       }
     } else {
       // For 2-person debates, notify opponent it's their turn

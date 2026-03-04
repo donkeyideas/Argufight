@@ -134,9 +134,21 @@ export async function triggerAIResponseForDebate(debateId: string): Promise<bool
     const wordCount = calculateWordCount(aiResponse)
     await updateUserAnalyticsOnStatement(aiUser.id, wordCount)
 
-    // Send push notification to human opponent
+    // Notify human opponent it's their turn (in-app + push)
     const humanId = isChallenger ? debate.opponentId : debate.challengerId
     if (humanId) {
+      // In-app notification (non-blocking)
+      prisma.notification.create({
+        data: {
+          userId: humanId,
+          type: 'DEBATE_TURN' as any,
+          title: 'Your Turn to Argue',
+          message: `It's your turn in "${debate.topic}"`,
+          debateId,
+        },
+      }).catch(() => {})
+
+      // Push notification
       try {
         const { sendYourTurnPushNotification } = await import('@/lib/notifications/push-notifications')
         await sendYourTurnPushNotification(humanId, debateId, debate.topic)

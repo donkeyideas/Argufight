@@ -267,12 +267,26 @@ export async function GET(request: NextRequest) {
             const wordCount = calculateWordCount(aiResponse)
             await updateUserAnalyticsOnStatement(aiUser.id, wordCount)
 
-            // Send push notification to opponent (non-blocking)
+            // Notify human opponent it's their turn (in-app + push, non-blocking)
             const humanOpponentId = debate.challengerId === aiUser.id ? debate.opponentId : debate.challengerId
-            const { sendYourTurnPushNotification } = await import('@/lib/notifications/push-notifications')
-            sendYourTurnPushNotification(humanOpponentId, debate.id, debate.topic).catch((error) => {
-              console.error('[AI Tasks] Failed to send push notification:', error)
-            })
+            if (humanOpponentId) {
+              prisma.notification.create({
+                data: {
+                  userId: humanOpponentId,
+                  type: 'DEBATE_TURN',
+                  title: 'Your Turn to Argue',
+                  message: `It's your turn in "${debate.topic}"`,
+                  debateId: debate.id,
+                },
+              }).catch((error) => {
+                console.error('[AI Tasks] Failed to create turn notification:', error)
+              })
+
+              const { sendYourTurnPushNotification } = await import('@/lib/notifications/push-notifications')
+              sendYourTurnPushNotification(humanOpponentId, debate.id, debate.topic).catch((error) => {
+                console.error('[AI Tasks] Failed to send push notification:', error)
+              })
+            }
 
             // Check if both users have now submitted for this round
             // We know the AI just submitted, so check if the other participant already had
