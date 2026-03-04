@@ -14,7 +14,7 @@ export default async function TrendingPage() {
   const debates = await prisma.debate.findMany({
     where: {
       status: { in: ['ACTIVE', 'VERDICT_READY', 'COMPLETED'] },
-      visibility: 'PUBLIC',
+      OR: [{ isPrivate: false }, { visibility: 'PUBLIC' }],
     },
     include: {
       challenger: { select: { username: true, avatarUrl: true, eloRating: true } },

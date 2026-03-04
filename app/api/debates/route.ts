@@ -473,6 +473,7 @@ export async function POST(request: NextRequest) {
           speedMode: speedMode || false,
           allowCopyPaste: allowCopyPaste !== false, // Default to true
           isPrivate: isPrivate || false,
+          visibility: isPrivate ? 'PRIVATE' : 'PUBLIC',
           shareToken,
           challengeType,
           invitedUserIds: invitedUserIds ? JSON.stringify(invitedUserIds) : null,
@@ -512,8 +513,9 @@ export async function POST(request: NextRequest) {
         
         // Build dynamic INSERT statement based on existing columns
         const insertColumns = [
-          'id', 'topic', 'description', 'category', 'challenger_id', 'challenger_position',
+          'id', 'topic', 'description', 'category', 'slug', 'challenger_id', 'challenger_position',
           'opponent_position', 'opponent_id', 'total_rounds', 'round_duration', 'speed_mode',
+          'is_private', 'visibility', 'share_token',
           'challenge_type', 'invited_user_ids', 'invited_by', 'status', 'created_at', 'updated_at'
         ].filter(col => columnNames.includes(col))
         
@@ -531,11 +533,12 @@ export async function POST(request: NextRequest) {
         }
         
         const placeholders = insertColumns.map(() => '?').join(', ')
-        const values = [
+        const values: any[] = [
           debateId,
           topic.trim(),
           description?.trim() || null,
           category.toUpperCase(),
+          slug,
           userId,
           challengerPosition,
           opponentPosition,
@@ -543,6 +546,9 @@ export async function POST(request: NextRequest) {
           totalRounds || 5,
           roundDuration,
           speedMode ? 1 : 0,
+          isPrivate ? true : false,
+          isPrivate ? 'PRIVATE' : 'PUBLIC',
+          shareToken,
           challengeType,
           invitedUserIds ? JSON.stringify(invitedUserIds) : null,
           challengeType !== 'OPEN' ? userId : null,
@@ -686,6 +692,7 @@ export async function POST(request: NextRequest) {
                 status: 'ACTIVE',
                 startedAt: new Date(),
                 roundDeadline: new Date(Date.now() + (debate.roundDuration || 86400000)),
+                visibility: debate.isPrivate ? 'PRIVATE' : 'PUBLIC',
               },
             })
             // Trigger AI's opening argument

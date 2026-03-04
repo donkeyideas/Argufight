@@ -155,6 +155,7 @@ export async function POST(
             startedAt: now,
             currentRound: 1,
             roundDeadline: deadline,
+            visibility: debate.isPrivate ? 'PRIVATE' : 'PUBLIC',
           },
         })
 
@@ -301,6 +302,7 @@ export async function POST(
           startedAt: now,
           currentRound: 1,
           roundDeadline: deadline,
+          visibility: current.isPrivate ? 'PRIVATE' : 'PUBLIC',
         },
         include: {
           challenger: {

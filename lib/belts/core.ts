@@ -622,6 +622,7 @@ export async function acceptBeltChallenge(challengeId: string) {
       speedMode,
       allowCopyPaste,
       isPrivate: false,
+      visibility: 'PUBLIC',
       challengeType: 'DIRECT',
       invitedUserIds: JSON.stringify([challenge.beltHolderId]),
       invitedBy: challenge.challengerId,

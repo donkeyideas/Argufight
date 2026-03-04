@@ -33,7 +33,11 @@ const getPublicDashboardData = unstable_cache(
   async () => {
     const [openChallenges, liveDebates, dailyChallenge] = await Promise.all([
       prisma.debate.findMany({
-        where: { status: 'WAITING', opponentId: null, isPrivate: false },
+        where: {
+          status: 'WAITING',
+          opponentId: null,
+          OR: [{ isPrivate: false }, { visibility: 'PUBLIC' }],
+        },
         select: {
           id: true,
           topic: true,
@@ -46,7 +50,10 @@ const getPublicDashboardData = unstable_cache(
       }),
 
       prisma.debate.findMany({
-        where: { status: { in: ['ACTIVE', 'WAITING'] }, isPrivate: false },
+        where: {
+          status: { in: ['ACTIVE', 'WAITING'] },
+          OR: [{ isPrivate: false }, { visibility: 'PUBLIC' }],
+        },
         select: {
           id: true,
           topic: true,
@@ -87,7 +94,7 @@ const getPublicDashboardData = unstable_cache(
     return { openChallenges, liveDebates, dailyChallenge };
   },
   ['dashboard-public'],
-  { revalidate: 60 }
+  { revalidate: 30 }
 );
 
 // ──────────────────────────────────────────────

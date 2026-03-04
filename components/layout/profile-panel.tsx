@@ -64,7 +64,7 @@ const getProfileData = unstable_cache(
     return { user, recentDebates, userRank };
   },
   ['profile-panel'],
-  { revalidate: 120 }
+  { revalidate: 30 }
 );
 
 export async function ProfilePanel({ userId }: Props) {

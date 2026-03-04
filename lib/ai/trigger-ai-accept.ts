@@ -130,6 +130,7 @@ export async function triggerAIAutoAccept(): Promise<number> {
                 status: 'ACTIVE',
                 startedAt: new Date(),
                 roundDeadline: new Date(Date.now() + challenge.roundDuration),
+                visibility: challenge.isPrivate ? 'PRIVATE' : 'PUBLIC',
               },
             }),
             prisma.userSubscription.upsert({
