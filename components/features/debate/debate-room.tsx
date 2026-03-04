@@ -78,6 +78,16 @@ export function DebateRoom({ debate, currentUserId }: DebateRoomProps) {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [waitingForAI, router]);
+
+  // Spectator heartbeat — ping every 20s so the count stays live
+  useEffect(() => {
+    const ping = () => {
+      fetch(`/api/debates/${debate.id}/spectate`, { method: 'POST' }).catch(() => {});
+    };
+    ping(); // initial ping on mount
+    const interval = setInterval(ping, 20_000);
+    return () => clearInterval(interval);
+  }, [debate.id]);
   const verdicts: any[] = debate.verdicts ?? [];
   const challengerWinCount = verdicts.filter((v: any) => v.decision === 'CHALLENGER_WINS').length;
   const opponentWinCount   = verdicts.filter((v: any) => v.decision === 'OPPONENT_WINS').length;
