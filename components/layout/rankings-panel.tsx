@@ -149,7 +149,7 @@ export async function RankingsPanel({ userId }: Props) {
                   <p className="text-[15px] font-[500] whitespace-nowrap overflow-hidden text-ellipsis">{belt.name}</p>
                   <p className="text-[13px] text-text-3">{daysHeld} days held</p>
                 </div>
-                <span className="text-[12px] font-[600] uppercase tracking-[0.5px] px-2 py-0.5 rounded-[20px] border border-[rgba(77,255,145,0.3)] text-[var(--green)] bg-[rgba(77,255,145,0.05)] flex-shrink-0 whitespace-nowrap">
+                <span className="text-[12px] font-[600] uppercase tracking-[0.5px] text-[var(--green)] flex-shrink-0 whitespace-nowrap">
                   Active
                 </span>
               </div>
@@ -173,10 +173,10 @@ export async function RankingsPanel({ userId }: Props) {
           tournaments.map((t) => {
             const tagColor =
               t.status === 'REGISTRATION_OPEN'
-                ? 'border-[rgba(77,255,145,0.3)] text-[var(--green)] bg-[rgba(77,255,145,0.05)]'
+                ? 'text-[var(--green)]'
                 : t.status === 'IN_PROGRESS'
-                  ? 'border-[rgba(212,240,80,0.3)] text-accent bg-[rgba(212,240,80,0.05)]'
-                  : 'border-[rgba(77,159,255,0.3)] text-[var(--blue)] bg-[rgba(77,159,255,0.05)]';
+                  ? 'text-accent'
+                  : 'text-[var(--blue)]';
             const tagLabel =
               t.status === 'REGISTRATION_OPEN' ? 'Open'
               : t.status === 'IN_PROGRESS'      ? 'Live'
@@ -191,7 +191,7 @@ export async function RankingsPanel({ userId }: Props) {
                   <p className="text-[15px] font-[500] whitespace-nowrap overflow-hidden text-ellipsis">{t.name}</p>
                   <p className="text-[13px] text-text-3">{t._count.participants}/{t.maxParticipants}</p>
                 </div>
-                <span className={cn('text-[12px] font-[600] uppercase tracking-[0.5px] px-2 py-0.5 rounded-[20px] border flex-shrink-0 whitespace-nowrap', tagColor)}>
+                <span className={cn('text-[12px] font-[600] uppercase tracking-[0.5px] flex-shrink-0 whitespace-nowrap', tagColor)}>
                   {tagLabel}
                 </span>
               </Link>

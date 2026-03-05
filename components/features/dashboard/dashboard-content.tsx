@@ -305,11 +305,11 @@ export async function DashboardContent({ userId }: { userId: string }) {
                 &ldquo;{debate.topic}&rdquo;
               </span>
               {debate.status === 'ACTIVE' ? (
-                <span className="text-[13px] font-[500] text-text-3 border border-border rounded-[20px] px-2 py-0.5 whitespace-nowrap flex-shrink-0">
+                <span className="text-[13px] font-[500] text-text-3 whitespace-nowrap flex-shrink-0">
                   Round {debate.currentRound} / {debate.totalRounds}
                 </span>
               ) : (
-                <span className="text-[13px] font-[600] uppercase tracking-[0.5px] border border-[rgba(255,77,77,0.3)] text-[var(--red)] bg-[rgba(255,77,77,0.06)] rounded-[20px] px-2.5 py-0.5 whitespace-nowrap flex-shrink-0">
+                <span className="text-[13px] font-[600] uppercase tracking-[0.5px] text-[var(--red)] whitespace-nowrap flex-shrink-0">
                   Waiting
                 </span>
               )}
@@ -338,7 +338,7 @@ export async function DashboardContent({ userId }: { userId: string }) {
           <span className="text-border-2">/</span>
           <span>Open for discussion</span>
           <span className="text-border-2">/</span>
-          <span className="text-[13px] font-[600] tracking-[0.5px] px-2 py-0.5 rounded-[20px] border border-[rgba(212,240,80,0.3)] text-accent bg-[rgba(212,240,80,0.06)]">
+          <span className="text-[13px] font-[600] tracking-[0.5px] text-accent">
             Today only
           </span>
         </div>

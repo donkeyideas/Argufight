@@ -169,11 +169,11 @@ export function LiveDebatesFeed({ debates, userDebates = [] }: Props) {
               {/* Right */}
               <div className="text-right flex-shrink-0">
                 {debate.status === 'WAITING' ? (
-                  <div className="text-[13px] font-[600] uppercase tracking-[0.5px] border border-[rgba(212,240,80,0.3)] text-accent bg-[rgba(212,240,80,0.06)] rounded-[20px] px-2.5 py-0.5 whitespace-nowrap inline-block">
+                  <div className="text-[13px] font-[600] uppercase tracking-[0.5px] text-accent whitespace-nowrap">
                     Open
                   </div>
                 ) : (
-                  <div className="text-[13px] font-[500] text-text-3 border border-border rounded-[20px] px-2 py-0.5 mb-0.5 whitespace-nowrap inline-block">
+                  <div className="text-[13px] font-[500] text-text-3 mb-0.5 whitespace-nowrap">
                     Round {debate.currentRound} / {debate.totalRounds}
                   </div>
                 )}

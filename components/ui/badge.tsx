@@ -11,13 +11,13 @@ interface BadgeProps {
 }
 
 const colorStyles: Record<BadgeColor, string> = {
-  accent:  'bg-[rgba(212,240,80,0.12)] text-accent border-[rgba(212,240,80,0.2)]',
-  red:     'bg-[var(--red-muted)] text-[var(--red)] border-transparent',
-  green:   'bg-[var(--green-muted)] text-[var(--green)] border-transparent',
-  blue:    'bg-[var(--blue-muted)] text-[var(--blue)] border-transparent',
-  amber:   'bg-[var(--amber-muted)] text-[var(--amber)] border-transparent',
-  muted:   'bg-surface-2 text-text-3 border-transparent',
-  default: 'bg-surface-3 text-text-2 border-border',
+  accent:  'text-accent',
+  red:     'text-[var(--red)]',
+  green:   'text-[var(--green)]',
+  blue:    'text-[var(--blue)]',
+  amber:   'text-[var(--amber)]',
+  muted:   'text-text-3',
+  default: 'text-text-2',
 };
 
 const dotColors: Record<BadgeColor, string> = {
@@ -40,10 +40,10 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 border rounded-full font-[450]',
+        'inline-flex items-center gap-1.5 font-[500] uppercase tracking-[0.5px]',
         'whitespace-nowrap leading-none',
-        size === 'sm' && 'text-[13px] px-2 py-1',
-        size === 'md' && 'text-xs px-2.5 py-1.5',
+        size === 'sm' && 'text-[12px]',
+        size === 'md' && 'text-[13px]',
         colorStyles[color],
         className
       )}

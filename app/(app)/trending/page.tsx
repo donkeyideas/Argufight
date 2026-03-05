@@ -32,7 +32,7 @@ export default async function TrendingPage() {
         <h1 className="heading-1">Trending Debates</h1>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {debates.map((debate, i) => (
           <Link key={debate.id} href={`/debate/${debate.id}`}>
             <Card hover padding="md" className="group">
