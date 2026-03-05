@@ -98,11 +98,12 @@ export default async function DebatePage({ params }: Props) {
     });
   }
 
-  // For private debates, only participants can view
+  // For private debates, only participants (and admins) can view
   if (
     debate.isPrivate &&
     session?.userId !== debate.challengerId &&
-    session?.userId !== debate.opponentId
+    session?.userId !== debate.opponentId &&
+    !session?.isAdmin
   ) {
     redirect('/dashboard');
   }
