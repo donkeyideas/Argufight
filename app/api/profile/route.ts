@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySession } from '@/lib/auth/session'
+import { getSession } from '@/lib/auth/session-verify'
 import { prisma } from '@/lib/db/prisma'
 import { getUserIdFromSession } from '@/lib/auth/session-utils'
 
 // GET /api/profile - Get current user's profile
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    let userId: string | null = null
     const session = await verifySession()
-    const userId = getUserIdFromSession(session)
+    if (session) userId = getUserIdFromSession(session)
+    if (!userId) {
+      const authHeader = request.headers.get('authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        const bearerSession = await getSession(authHeader.slice(7))
+        if (bearerSession) userId = bearerSession.userId
+      }
+    }
 
     if (!userId) {
       console.log('[API /profile] No userId found, returning 401')

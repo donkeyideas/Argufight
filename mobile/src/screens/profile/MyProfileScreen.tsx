@@ -1,25 +1,37 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Settings, Zap } from 'lucide-react-native';
+import { ArrowLeft, Settings, Zap, Trophy, X, Minus } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { StatCard } from '../../components/ui/StatCard';
 import { Button } from '../../components/ui/Button';
 import { usersApi } from '../../api/users';
+import { debatesApi } from '../../api/debates';
 import { useAuthStore } from '../../store/authStore';
 
 export function MyProfileScreen({ navigation }: any) {
   const { colors } = useTheme();
   const user = useAuthStore((s) => s.user);
 
-  const { data: profile } = useQuery({
+  const { data: profileData } = useQuery({
     queryKey: ['myProfile'],
     queryFn: usersApi.getProfile,
   });
 
-  const p = profile ?? user;
+  const { data: historyData } = useQuery({
+    queryKey: ['myDebateHistory'],
+    queryFn: debatesApi.getHistory,
+  });
+
+  const p = profileData?.user ?? profileData ?? user;
+  const wins = p?.debatesWon ?? (p as any)?.wins ?? 0;
+  const losses = p?.debatesLost ?? (p as any)?.losses ?? 0;
+  const total = p?.totalDebates ?? 0;
+  const winRate = total > 0 ? Math.round((wins / total) * 100) + '%' : '0%';
+
+  const recentDebates: any[] = (historyData?.debates ?? []).slice(0, 5);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['top']}>
@@ -56,14 +68,10 @@ export function MyProfileScreen({ navigation }: any) {
 
           {/* Stats grid */}
           <View style={styles.statsGrid}>
-            <StatCard value={p?.totalDebates ?? 0} label="Total" />
-            <StatCard value={p?.wins ?? 0} label="Wins" color={colors.green} />
-            <StatCard value={p?.losses ?? 0} label="Losses" color={colors.red} />
-            <StatCard
-              value={p?.totalDebates > 0 ? Math.round(((p?.wins ?? 0) / p.totalDebates) * 100) + '%' : '0%'}
-              label="Win Rate"
-              color={colors.accent}
-            />
+            <StatCard value={total} label="Total" />
+            <StatCard value={wins} label="Wins" color={colors.green} />
+            <StatCard value={losses} label="Losses" color={colors.red} />
+            <StatCard value={winRate} label="Win Rate" color={colors.accent} />
           </View>
 
           <Button
@@ -74,6 +82,42 @@ export function MyProfileScreen({ navigation }: any) {
           >
             Edit Profile
           </Button>
+
+          {/* Recent Debates */}
+          {recentDebates.length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Debates</Text>
+              {recentDebates.map((debate) => {
+                const opponent =
+                  debate.challengerId === user?.id ? debate.opponent : debate.challenger;
+                const isWin = debate.userWon;
+                const isDraw = debate.status === 'COMPLETED' && !debate.winnerId;
+                const badgeColor = isWin ? colors.green : isDraw ? colors.text3 : colors.red;
+                const badgeLabel = isWin ? 'W' : isDraw ? 'D' : 'L';
+
+                return (
+                  <TouchableOpacity
+                    key={debate.id}
+                    style={[styles.debateRow, { borderColor: colors.border }]}
+                    onPress={() => navigation.navigate('DebateRoom', { debateId: debate.id })}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.badge, { backgroundColor: badgeColor + '20', borderColor: badgeColor + '40' }]}>
+                      <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeLabel}</Text>
+                    </View>
+                    <View style={styles.debateInfo}>
+                      <Text style={[styles.debateTopic, { color: colors.text }]} numberOfLines={1}>
+                        {debate.topic}
+                      </Text>
+                      <Text style={[styles.debateMeta, { color: colors.text3 }]}>
+                        vs {opponent?.username ?? 'Unknown'} · {new Date(debate.createdAt).toLocaleDateString()}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -93,4 +137,12 @@ const styles = StyleSheet.create({
   handle: { fontSize: 14, marginBottom: 8 },
   bio: { fontSize: 14, lineHeight: 20, marginBottom: 16 },
   statsGrid: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  section: { marginTop: 28 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
+  debateRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1 },
+  badge: { width: 32, height: 32, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  badgeText: { fontSize: 13, fontWeight: '700' },
+  debateInfo: { flex: 1 },
+  debateTopic: { fontSize: 14, fontWeight: '500', marginBottom: 2 },
+  debateMeta: { fontSize: 12 },
 });
