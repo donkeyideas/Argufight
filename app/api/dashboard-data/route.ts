@@ -1,5 +1,6 @@
-import { NextResponse, after } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { verifySession } from '@/lib/auth/session'
+import { getSession } from '@/lib/auth/session-verify'
 import { getUserIdFromSession } from '@/lib/auth/session-utils'
 import { prisma } from '@/lib/db/prisma'
 import { getFeatureFlags, FEATURE_KEYS } from '@/lib/features'
@@ -111,7 +112,7 @@ const recentDebateSelect = {
 } as const
 
 // GET /api/dashboard-data — single endpoint for all dashboard panel data
-export async function GET() {
+export async function GET(request: NextRequest) {
   // Trigger AI auto-accept and expired debate processing after response is sent
   after(async () => {
     try {
@@ -123,8 +124,18 @@ export async function GET() {
   })
 
   try {
+    let userId: string | null = null
     const session = await verifySession()
-    const userId = session ? getUserIdFromSession(session) : null
+    if (session) userId = getUserIdFromSession(session)
+
+    // Bearer token fallback for mobile
+    if (!userId) {
+      const authHeader = request.headers.get('authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        const bearerSession = await getSession(authHeader.slice(7))
+        if (bearerSession) userId = bearerSession.userId
+      }
+    }
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

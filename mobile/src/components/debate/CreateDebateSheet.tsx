@@ -17,11 +17,12 @@ interface CreateDebateSheetProps {
   visible: boolean;
   onClose: () => void;
   onCreated?: (debate: any) => void;
+  prefillTopic?: string;
 }
 
-export function CreateDebateSheet({ visible, onClose, onCreated }: CreateDebateSheetProps) {
+export function CreateDebateSheet({ visible, onClose, onCreated, prefillTopic }: CreateDebateSheetProps) {
   const { colors } = useTheme();
-  const [topic, setTopic] = useState('');
+  const [topic, setTopic] = useState(prefillTopic ?? '');
   const [category, setCategory] = useState('POLITICS');
   const [position, setPosition] = useState<'FOR' | 'AGAINST'>('FOR');
   const [totalRounds, setTotalRounds] = useState(5);
@@ -35,6 +36,12 @@ export function CreateDebateSheet({ visible, onClose, onCreated }: CreateDebateS
   const [searching, setSearching] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
+
+  // Sync prefillTopic when sheet opens
+  React.useEffect(() => {
+    if (visible && prefillTopic) setTopic(prefillTopic);
+    if (!visible) setTopic(prefillTopic ?? '');
+  }, [visible, prefillTopic]);
 
   const searchUsers = useCallback(async (q: string) => {
     setOpponentQuery(q);

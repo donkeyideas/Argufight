@@ -22,14 +22,13 @@ export interface Debate {
   updatedAt: string;
 }
 
+// Raw shape returned by /api/dashboard-data (web format)
 export interface DashboardData {
-  openChallenges: any[];
-  liveDebates: any[];
-  dailyChallenge: any;
-  myActiveDebates: any[];
-  yourTurnDebate: any;
-  verdictDebate: any;
-  isNewUser: boolean;
+  activeDebates: { debates: any[] };
+  userActiveDebates: { debates: any[] };
+  waitingDebates: { debates: any[] };
+  yourTurn: { hasTurn: boolean; debateId?: string; topic?: string; round?: number; deadline?: string } | null;
+  nav: { coinBalance: number; unreadCount: number };
 }
 
 export const debatesApi = {
@@ -88,6 +87,9 @@ export const debatesApi = {
 
   getSaved: () =>
     apiFetch('/api/debates/saved'),
+
+  getDailyChallenge: () =>
+    apiFetch<{ challenge: any; participationCount: number }>('/api/daily-challenge'),
 
   getCategories: () =>
     apiFetch('/api/categories'),
