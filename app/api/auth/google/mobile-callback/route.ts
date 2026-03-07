@@ -169,13 +169,29 @@ export async function GET(request: NextRequest) {
         },
       })
 
-      // Redirect to a separate URL with the token so WebBrowser.openAuthSessionAsync
-      // can detect the URL change and capture the token
+      // Extract the returnTo URL from OAuth state (passed by mobile app)
+      let mobileRedirect = ''
+      try {
+        const stateData = JSON.parse(state || '{}')
+        mobileRedirect = stateData.returnTo || ''
+      } catch {
+        mobileRedirect = ''
+      }
+
+      // Redirect to the app's custom scheme URL with the token
+      // openAuthSessionAsync on Android detects custom scheme redirects
+      if (mobileRedirect && !mobileRedirect.startsWith('http')) {
+        // Custom scheme (e.g., exp://..., argufight://...)
+        const separator = mobileRedirect.includes('?') ? '&' : '?'
+        const redirectUrl = `${mobileRedirect}${separator}token=${encodeURIComponent(sessionJWT)}&success=true&userId=${encodeURIComponent(user.id)}`
+        return NextResponse.redirect(redirectUrl)
+      }
+
+      // Fallback: redirect to HTTPS path
       const completeUrl = new URL(`${baseUrl}/auth/mobile-complete`)
       completeUrl.searchParams.set('token', sessionJWT)
       completeUrl.searchParams.set('success', 'true')
       completeUrl.searchParams.set('userId', user.id)
-
       return NextResponse.redirect(completeUrl.toString())
     } catch (error: any) {
       console.error('[Mobile Google OAuth Callback] Error:', error)
