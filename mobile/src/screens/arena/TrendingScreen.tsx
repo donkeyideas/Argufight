@@ -115,9 +115,17 @@ export function TrendingScreen({ navigation }: any) {
                 {item.spectatorCount ?? 0} watching
               </Text>
               <Text style={[styles.statusBadge, {
-                color: item.status === 'ACTIVE' ? colors.green : item.status === 'WAITING' ? colors.amber : colors.text3,
+                color: item.status === 'ACTIVE' ? colors.green
+                  : item.status === 'WAITING' ? colors.amber
+                  : item.status === 'VERDICT_READY' ? colors.accent
+                  : colors.text3,
               }]}>
-                {item.status === 'ACTIVE' ? 'Live' : item.status === 'WAITING' ? 'Open' : item.status}
+                {item.status === 'ACTIVE' ? 'Live'
+                  : item.status === 'WAITING' ? 'Open'
+                  : item.status === 'VERDICT_READY' ? 'Verdict Ready'
+                  : item.status === 'COMPLETED' ? 'Completed'
+                  : item.status === 'CANCELLED' ? 'Cancelled'
+                  : item.status?.replace(/_/g, ' ')}
               </Text>
             </View>
           </TouchableOpacity>
