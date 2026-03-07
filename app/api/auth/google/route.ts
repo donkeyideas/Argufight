@@ -33,11 +33,12 @@ export async function GET(request: NextRequest) {
   const returnTo = searchParams.get('returnTo') || '/'
   const userType = searchParams.get('userType') || 'user' // 'user', 'advertiser', or 'employee'
   const addAccount = searchParams.get('addAccount') === 'true'
+  const pollId = searchParams.get('pollId') || ''
   // Detect mobile by checking for any custom scheme (not http/https or relative path)
   const isMobile = returnTo !== '/' && !returnTo.startsWith('/') && !returnTo.startsWith('http')
 
   // Use mobile callback if it's a mobile request
-  const finalRedirectUri = isMobile 
+  const finalRedirectUri = isMobile
     ? `${baseUrl}/api/auth/google/mobile-callback`
     : redirectUri
 
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     scope: 'openid email profile',
     access_type: 'offline',
     prompt: 'consent',
-    state: JSON.stringify({ returnTo, userType, addAccount, isMobile }), // Store return URL, user type, addAccount flag, and mobile flag for CSRF protection
+    state: JSON.stringify({ returnTo, userType, addAccount, isMobile, pollId }),
   })
 
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`

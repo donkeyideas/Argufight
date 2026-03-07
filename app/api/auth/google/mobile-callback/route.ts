@@ -169,28 +169,81 @@ export async function GET(request: NextRequest) {
         },
       })
 
-      // Extract the returnTo URL from OAuth state (passed by mobile app)
+      // Extract the returnTo URL and pollId from OAuth state
       let mobileRedirect = ''
+      let pollId = ''
       try {
         const stateData = JSON.parse(state || '{}')
         mobileRedirect = stateData.returnTo || ''
+        pollId = stateData.pollId || ''
       } catch {
         mobileRedirect = ''
       }
 
-      // Build the app redirect URL with token
-      const separator = mobileRedirect.includes('?') ? '&' : '?'
-      const appRedirectUrl = mobileRedirect && !mobileRedirect.startsWith('http')
-        ? `${mobileRedirect}${separator}token=${encodeURIComponent(sessionJWT)}&success=true&userId=${encodeURIComponent(user.id)}`
-        : `argufight://auth?token=${encodeURIComponent(sessionJWT)}&success=true&userId=${encodeURIComponent(user.id)}`
+      // Store token for polling (mobile app polls this if redirect fails)
+      if (pollId) {
+        await prisma.adminSetting.upsert({
+          where: { key: `mobile_auth_${pollId}` },
+          create: {
+            key: `mobile_auth_${pollId}`,
+            value: JSON.stringify({
+              token: sessionJWT,
+              user: {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                avatarUrl: user.avatarUrl,
+                eloRating: (user as any).eloRating ?? 1000,
+                isAdmin: (user as any).isAdmin ?? false,
+                isBanned: (user as any).isBanned ?? false,
+                coins: (user as any).coins ?? 0,
+                hasCompletedOnboarding: (user as any).hasCompletedOnboarding ?? false,
+              },
+            }),
+          },
+          update: {
+            value: JSON.stringify({
+              token: sessionJWT,
+              user: {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                avatarUrl: user.avatarUrl,
+                eloRating: (user as any).eloRating ?? 1000,
+                isAdmin: (user as any).isAdmin ?? false,
+                isBanned: (user as any).isBanned ?? false,
+                coins: (user as any).coins ?? 0,
+                hasCompletedOnboarding: (user as any).hasCompletedOnboarding ?? false,
+              },
+            }),
+          },
+        })
+      }
 
-      // Use raw Response with 302 + Location header to redirect to custom scheme
-      // NextResponse.redirect() rejects non-HTTP URLs, but raw Response works
-      // Chrome Custom Tabs intercept 302 redirects to custom schemes at the network level
-      return new Response(null, {
-        status: 302,
-        headers: { 'Location': appRedirectUrl },
-      })
+      // Return an HTML page that tries multiple redirect strategies
+      // and shows a "return to app" button as fallback
+      const appRedirectUrl = mobileRedirect && !mobileRedirect.startsWith('http')
+        ? `${mobileRedirect}${mobileRedirect.includes('?') ? '&' : '?'}token=${encodeURIComponent(sessionJWT)}&success=true`
+        : `argufight://auth?token=${encodeURIComponent(sessionJWT)}&success=true`
+
+      return new Response(
+        `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login Successful</title>
+<style>body{font-family:system-ui;text-align:center;padding:60px 20px;background:#0a0a0a;color:#fff}
+.btn{display:inline-block;padding:16px 32px;background:#6366f1;color:#fff;border-radius:12px;text-decoration:none;font-size:16px;font-weight:600;margin-top:24px}
+p{color:#999;margin-top:12px;font-size:14px}</style>
+</head><body>
+<h2>Login Successful!</h2>
+<a class="btn" href="${appRedirectUrl.replace(/"/g, '&quot;')}">Return to ArguFight</a>
+<p>Tap the button above to return to the app.</p>
+<p>If the button doesn't work, close this window<br>and reopen ArguFight.</p>
+<script>
+try { window.location.href = ${JSON.stringify(appRedirectUrl)}; } catch(e) {}
+</script>
+</body></html>`,
+        { status: 200, headers: { 'Content-Type': 'text/html' } }
+      )
     } catch (error: any) {
       console.error('[Mobile Google OAuth Callback] Error:', error)
       return NextResponse.json(
