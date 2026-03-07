@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySession } from '@/lib/auth/session'
+import { getSession } from '@/lib/auth/session-verify'
 import { prisma } from '@/lib/db/prisma'
 import { getUserIdFromSession } from '@/lib/auth/session-utils'
 import { calculateWordCount, updateUserAnalyticsOnStatement } from '@/lib/utils/analytics'
@@ -11,12 +12,21 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Resolve userId from cookie session or Bearer token (mobile)
+    let userId: string | null = null
     const session = await verifySession()
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (session) {
+      userId = getUserIdFromSession(session)
+    }
+    if (!userId) {
+      const authHeader = request.headers.get('authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        const bearerSession = await getSession(authHeader.slice(7))
+        if (bearerSession) userId = bearerSession.userId
+      }
+    }
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id } = await params
@@ -56,14 +66,6 @@ export async function POST(
       return NextResponse.json(
         { error: 'Debate is not active' },
         { status: 400 }
-      )
-    }
-
-    const userId = getUserIdFromSession(session)
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
       )
     }
 

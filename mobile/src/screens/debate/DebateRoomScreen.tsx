@@ -1,10 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, KeyboardAvoidingView, Platform, FlatList, Alert,
+  TextInput, Keyboard, Platform, FlatList, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Eye, Send, MessageCircle } from 'lucide-react-native';
+import { ArrowLeft, Eye, Send, MessageCircle, Mic, MicOff } from 'lucide-react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
@@ -12,7 +12,24 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import { debatesApi } from '../../api/debates';
 import { useAuthStore } from '../../store/authStore';
 
+// expo-speech-recognition requires a dev build — not available in Expo Go.
+// Load it dynamically so the rest of the app still works in Expo Go.
+let _speechModule: any = null;
+function _noOpHook(_event: string, _cb: any) { useEffect(() => {}, []); }
+let _useSpeechRecognitionEvent: (_event: string, _cb: any) => void = _noOpHook;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const sr = require('expo-speech-recognition');
+  _speechModule = sr.ExpoSpeechRecognitionModule ?? null;
+  if (typeof sr.useSpeechRecognitionEvent === 'function') {
+    _useSpeechRecognitionEvent = sr.useSpeechRecognitionEvent;
+  }
+} catch {}
+const speechModule = _speechModule;
+const useSpeechRecognitionEvent = _useSpeechRecognitionEvent;
+
 type Tab = 'arguments' | 'chat' | 'verdict';
+type VoiceTarget = 'statement' | 'chat' | null;
 
 export function DebateRoomScreen({ navigation, route }: any) {
   const { colors } = useTheme();
@@ -24,6 +41,70 @@ export function DebateRoomScreen({ navigation, route }: any) {
   const [tab, setTab] = useState<Tab>('arguments');
   const [statement, setStatement] = useState('');
   const [chatMsg, setChatMsg] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [voiceTarget, setVoiceTarget] = useState<VoiceTarget>(null);
+  const [kbHeight, setKbHeight] = useState(0);
+
+  // Track keyboard height manually — more reliable than KeyboardAvoidingView on Android
+  useEffect(() => {
+    const show = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => setKbHeight(e.endCoordinates.height)
+    );
+    const hide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKbHeight(0)
+    );
+    return () => { show.remove(); hide.remove(); };
+  }, []);
+
+  // Append recognized speech to the active input
+  useSpeechRecognitionEvent('result', (event) => {
+    const text = event.results[0]?.transcript ?? '';
+    if (!text) return;
+    if (voiceTarget === 'statement') {
+      setStatement((prev) => (prev ? `${prev} ${text}` : text));
+    } else if (voiceTarget === 'chat') {
+      setChatMsg((prev) => (prev ? `${prev} ${text}` : text));
+    }
+  });
+
+  useSpeechRecognitionEvent('end', () => {
+    setIsListening(false);
+    setVoiceTarget(null);
+  });
+
+  useSpeechRecognitionEvent('error', () => {
+    setIsListening(false);
+    setVoiceTarget(null);
+  });
+
+  const startVoice = useCallback(async (target: 'statement' | 'chat') => {
+    if (!speechModule) {
+      Alert.alert('Voice input unavailable', 'Install a development build to use voice-to-text.');
+      return;
+    }
+    if (isListening) {
+      speechModule.stop();
+      setIsListening(false);
+      setVoiceTarget(null);
+      return;
+    }
+    try {
+      const perm = await speechModule.requestPermissionsAsync();
+      if (!perm.granted) {
+        Alert.alert('Permission required', 'Microphone access is needed for voice input.');
+        return;
+      }
+      setVoiceTarget(target);
+      setIsListening(true);
+      speechModule.start({ lang: 'en-US', interimResults: true, continuous: false });
+    } catch {
+      Alert.alert('Voice input unavailable', 'Speech recognition is not supported on this device.');
+      setIsListening(false);
+      setVoiceTarget(null);
+    }
+  }, [isListening]);
 
   const { data: debate, isLoading } = useQuery({
     queryKey: ['debate', id],
@@ -127,11 +208,12 @@ export function DebateRoomScreen({ navigation, route }: any) {
         })}
       </View>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      {/* Content area — input bars are absolutely positioned above the keyboard */}
+      <View style={{ flex: 1 }}>
         {/* Arguments tab */}
         {tab === 'arguments' && (
           <>
-            <ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: canSubmit ? 120 : 40 }}>
+            <ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: canSubmit ? (kbHeight + 100) : 40 }}>
               {/* Players card */}
               <View style={[styles.players, { borderBottomColor: colors.border }]}>
                 <View style={styles.player}>
@@ -183,15 +265,18 @@ export function DebateRoomScreen({ navigation, route }: any) {
               </View>
             </ScrollView>
 
-            {/* Submit argument input */}
+            {/* Submit argument input — absolutely positioned above keyboard */}
             {canSubmit && (
-              <View style={[styles.submitBar, { backgroundColor: colors.bg, borderTopColor: colors.border }]}>
+              <View style={[styles.submitBar, { backgroundColor: colors.bg, borderTopColor: colors.border, bottom: kbHeight }]}>
                 <Text style={{ color: colors.text3, fontSize: 12, marginBottom: 6 }}>
                   Round {debate?.currentRound ?? 1} — Your argument
+                  {isListening && voiceTarget === 'statement' && (
+                    <Text style={{ color: '#ef4444' }}> ● Listening...</Text>
+                  )}
                 </Text>
                 <View style={styles.submitRow}>
                   <TextInput
-                    style={[styles.submitInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
+                    style={[styles.submitInput, { backgroundColor: colors.surface, borderColor: isListening && voiceTarget === 'statement' ? '#ef4444' : colors.border, color: colors.text }]}
                     placeholder="Type your argument..."
                     placeholderTextColor={colors.text3}
                     value={statement}
@@ -199,6 +284,16 @@ export function DebateRoomScreen({ navigation, route }: any) {
                     multiline
                     maxLength={5000}
                   />
+                  <TouchableOpacity
+                    style={[styles.iconBtn, { backgroundColor: isListening && voiceTarget === 'statement' ? '#ef4444' : colors.surface2 }]}
+                    onPress={() => startVoice('statement')}
+                  >
+                    {isListening && voiceTarget === 'statement' ? (
+                      <MicOff size={16} color="#fff" />
+                    ) : (
+                      <Mic size={16} color={colors.text3} />
+                    )}
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.sendBtn, { backgroundColor: statement.trim() ? colors.accent : colors.surface2 }]}
                     onPress={handleSubmitStatement}
@@ -218,7 +313,7 @@ export function DebateRoomScreen({ navigation, route }: any) {
             <FlatList
               data={chatMessages}
               keyExtractor={(item: any) => item.id}
-              contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
+              contentContainerStyle={{ padding: 16, paddingBottom: kbHeight + 80 }}
               renderItem={({ item }: any) => {
                 const isMe = item.authorId === user?.id;
                 return (
@@ -243,15 +338,25 @@ export function DebateRoomScreen({ navigation, route }: any) {
                 </View>
               }
             />
-            <View style={[styles.chatInputBar, { backgroundColor: colors.bg, borderTopColor: colors.border }]}>
+            <View style={[styles.chatInputBar, { backgroundColor: colors.bg, borderTopColor: colors.border, bottom: kbHeight }]}>
               <TextInput
-                style={[styles.chatInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
-                placeholder="Send a message..."
-                placeholderTextColor={colors.text3}
+                style={[styles.chatInput, { backgroundColor: colors.surface, borderColor: isListening && voiceTarget === 'chat' ? '#ef4444' : colors.border, color: colors.text }]}
+                placeholder={isListening && voiceTarget === 'chat' ? '● Listening...' : 'Send a message...'}
+                placeholderTextColor={isListening && voiceTarget === 'chat' ? '#ef4444' : colors.text3}
                 value={chatMsg}
                 onChangeText={setChatMsg}
                 maxLength={1000}
               />
+              <TouchableOpacity
+                style={[styles.iconBtn, { backgroundColor: isListening && voiceTarget === 'chat' ? '#ef4444' : colors.surface2 }]}
+                onPress={() => startVoice('chat')}
+              >
+                {isListening && voiceTarget === 'chat' ? (
+                  <MicOff size={16} color="#fff" />
+                ) : (
+                  <Mic size={16} color={colors.text3} />
+                )}
+              </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.sendBtn, { backgroundColor: chatMsg.trim() ? colors.accent : colors.surface2 }]}
                 onPress={handleSendChat}
@@ -322,7 +427,7 @@ export function DebateRoomScreen({ navigation, route }: any) {
             )}
           </ScrollView>
         )}
-      </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -346,15 +451,16 @@ const styles = StyleSheet.create({
   sectionLabel: { fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10 },
   statement: { padding: 14, borderRadius: 10, borderWidth: 1, marginBottom: 10, maxWidth: '85%' },
   stmtHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  // Submit bar
-  submitBar: { padding: 12, borderTopWidth: 1 },
+  // Submit bar — absolutely positioned so it floats above the keyboard
+  submitBar: { position: 'absolute', left: 0, right: 0, padding: 12, borderTopWidth: 1 },
   submitRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   submitInput: { flex: 1, borderWidth: 1, borderRadius: 10, padding: 10, fontSize: 14, maxHeight: 120, textAlignVertical: 'top' },
+  iconBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   sendBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   // Chat
   chatBubbleWrap: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginBottom: 10 },
   chatBubble: { maxWidth: '75%', padding: 10, borderRadius: 10, borderWidth: 1 },
-  chatInputBar: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderTopWidth: 1 },
+  chatInputBar: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderTopWidth: 1 },
   chatInput: { flex: 1, height: 40, borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, fontSize: 14 },
   // Verdicts
   resultCard: { padding: 20, borderRadius: 10, borderWidth: 1, alignItems: 'center', marginBottom: 16 },
