@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Keyboard, Platform, FlatList, Alert,
+  TextInput, Keyboard, Platform, FlatList, Alert, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Eye, Send, MessageCircle, Mic, MicOff } from 'lucide-react-native';
@@ -295,11 +295,16 @@ export function DebateRoomScreen({ navigation, route }: any) {
                     )}
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.sendBtn, { backgroundColor: statement.trim() ? colors.accent : colors.surface2 }]}
+                    style={[styles.sendBtn, {
+                      backgroundColor: submitMutation.isPending ? colors.accent + '80'
+                        : statement.trim() ? colors.accent : colors.surface2,
+                    }]}
                     onPress={handleSubmitStatement}
                     disabled={!statement.trim() || submitMutation.isPending}
                   >
-                    <Send size={18} color={statement.trim() ? colors.accentFg : colors.text3} />
+                    {submitMutation.isPending
+                      ? <ActivityIndicator size="small" color={colors.accentFg} />
+                      : <Send size={18} color={statement.trim() ? colors.accentFg : colors.text3} />}
                   </TouchableOpacity>
                 </View>
               </View>
