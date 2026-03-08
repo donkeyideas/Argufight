@@ -32,7 +32,7 @@ export function Input({ label, error, rightIcon, style, multiline, numberOfLines
         ]}
       >
         <TextInput
-          style={[styles.input, { color: colors.text }, style]}
+          style={[styles.input, multiline && styles.inputMultiline, { color: colors.text }, style]}
           placeholderTextColor={colors.text3}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -71,6 +71,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     paddingHorizontal: 14,
     height: '100%',
+  },
+  inputMultiline: {
+    height: undefined,
+    minHeight: 44,
   },
   rightIcon: {
     paddingRight: 12,
