@@ -92,7 +92,6 @@ export function LeaderboardScreen({ navigation }: any) {
                   {/* 1st place */}
                   {top3[0] && (
                     <View style={[styles.podiumItem, styles.podiumFirst]}>
-                      <Text style={styles.crownEmoji}>👑</Text>
                       <Text style={[styles.podiumRank, { color: MEDAL[0], fontSize: 22 }]}>1</Text>
                       <Avatar src={top3[0].avatarUrl} fallback={top3[0].username ?? '?'} size="xl" />
                       <Text style={[styles.podiumName, { color: colors.text, fontSize: 15 }]} numberOfLines={1}>{top3[0].username}</Text>
@@ -135,7 +134,7 @@ export function LeaderboardScreen({ navigation }: any) {
           return (
             <TouchableOpacity
               style={[styles.row, { borderBottomColor: colors.border }]}
-              onPress={() => navigation.navigate('ModalUserProfile', { userId: item.id || item.userId })}
+              onPress={() => navigation.navigate('ModalUserProfile', { id: item.id || item.userId })}
             >
               <Text style={[styles.rank, { color: colors.text3 }]}>{rank}</Text>
               <Avatar src={item.avatarUrl} fallback={item.username ?? '?'} size="sm" />

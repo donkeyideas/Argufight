@@ -48,10 +48,10 @@ export function UserProfileScreen({ navigation, route }: any) {
 
           <View style={styles.statsGrid}>
             <StatCard value={p?.totalDebates ?? 0} label="Total" />
-            <StatCard value={p?.wins ?? 0} label="Wins" color={colors.green} />
-            <StatCard value={p?.losses ?? 0} label="Losses" color={colors.red} />
+            <StatCard value={p?.debatesWon ?? p?.wins ?? 0} label="Wins" color={colors.green} />
+            <StatCard value={p?.debatesLost ?? p?.losses ?? 0} label="Losses" color={colors.red} />
             <StatCard
-              value={p?.totalDebates > 0 ? Math.round(((p?.wins ?? 0) / p.totalDebates) * 100) + '%' : '—'}
+              value={p?.totalDebates > 0 ? Math.round(((p?.debatesWon ?? p?.wins ?? 0) / p.totalDebates) * 100) + '%' : '—'}
               label="Win Rate"
               color={colors.accent}
             />

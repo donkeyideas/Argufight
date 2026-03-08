@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Trophy, Users, Calendar, Lock, Bell, MessageCircle } from 'lucide-react-native';
+import { Trophy, Users, Calendar, Lock, Bell, MessageCircle, Plus } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
@@ -45,6 +45,9 @@ export function TournamentsListScreen({ navigation }: any) {
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>Tournaments</Text>
         <View style={styles.headerIcons}>
+          <TouchableOpacity onPress={() => navigation.navigate('CreateTournament')} style={styles.iconBtn}>
+            <Plus size={20} color={colors.accent} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Conversations')} style={styles.iconBtn}>
             <MessageCircle size={18} color={colors.text2} />
           </TouchableOpacity>

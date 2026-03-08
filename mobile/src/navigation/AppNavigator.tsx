@@ -16,6 +16,7 @@ import { ChangePasswordScreen } from '../screens/settings/ChangePasswordScreen';
 import { TwoFactorScreen } from '../screens/settings/TwoFactorScreen';
 import { NotificationPrefsScreen } from '../screens/settings/NotificationPrefsScreen';
 import { AboutScreen } from '../screens/legal/AboutScreen';
+import { CreateTournamentScreen } from '../screens/tournaments/CreateTournamentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,7 @@ export function AppNavigator() {
         <Stack.Screen name="TwoFactor" component={TwoFactorScreen} />
         <Stack.Screen name="NotificationPrefs" component={NotificationPrefsScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="CreateTournament" component={CreateTournamentScreen} />
       </Stack.Group>
     </Stack.Navigator>
   );

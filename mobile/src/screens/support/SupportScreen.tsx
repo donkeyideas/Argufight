@@ -148,7 +148,7 @@ export function SupportScreen({ navigation }: any) {
           <Card>
             <Text style={{ color: colors.text, fontSize: 15, fontWeight: '500', marginBottom: 12 }}>New Ticket</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }, { color: colors.text }]}
               placeholder="Subject"
               placeholderTextColor={colors.text3}
               value={subject}
@@ -156,12 +156,13 @@ export function SupportScreen({ navigation }: any) {
               returnKeyType="next"
             />
             <TextInput
-              style={[styles.input, styles.textarea, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
+              style={[styles.input, styles.textarea, { backgroundColor: colors.surface, borderColor: colors.border }, { color: colors.text }]}
               placeholder="Describe your issue..."
               placeholderTextColor={colors.text3}
               value={description}
               onChangeText={setDescription}
               multiline
+              numberOfLines={5}
               textAlignVertical="top"
             />
             <Button variant="accent" size="md" fullWidth loading={submitting} onPress={handleCreateTicket}>
