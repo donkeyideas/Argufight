@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, Plus, Swords } from 'lucide-react-native';
+import { Bell, Plus, Swords, MessageCircle } from 'lucide-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
@@ -78,6 +78,9 @@ export function DashboardScreen({ navigation }: any) {
               {(user.coins ?? 0).toLocaleString()} coins
             </Text>
           )}
+          <TouchableOpacity onPress={() => navigation.navigate('Conversations')} style={styles.iconBtn}>
+            <MessageCircle size={18} color={colors.text2} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.iconBtn}>
             <Bell size={18} color={colors.text2} />
             <View style={[styles.notifDot, { backgroundColor: colors.red, borderColor: colors.bg }]} />

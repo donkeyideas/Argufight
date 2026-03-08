@@ -28,6 +28,7 @@ export function MyProfileScreen({ navigation }: any) {
   const p = profileData?.user ?? profileData ?? user;
   const wins = p?.debatesWon ?? (p as any)?.wins ?? 0;
   const losses = p?.debatesLost ?? (p as any)?.losses ?? 0;
+  const draws = p?.debatesTied ?? 0;
   const total = p?.totalDebates ?? 0;
   const winRate = total > 0 ? Math.round((wins / total) * 100) + '%' : '0%';
 
@@ -71,6 +72,7 @@ export function MyProfileScreen({ navigation }: any) {
             <StatCard value={total} label="Total" />
             <StatCard value={wins} label="Wins" color={colors.green} />
             <StatCard value={losses} label="Losses" color={colors.red} />
+            <StatCard value={draws} label="Draws" color={colors.amber} />
             <StatCard value={winRate} label="Win Rate" color={colors.accent} />
           </View>
 
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
   eloBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 3, borderRadius: 20, borderWidth: 1, marginLeft: 8 },
   handle: { fontSize: 14, marginBottom: 8 },
   bio: { fontSize: 14, lineHeight: 20, marginBottom: 16 },
-  statsGrid: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
   section: { marginTop: 28 },
   sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   debateRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1 },
