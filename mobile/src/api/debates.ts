@@ -97,6 +97,9 @@ export const debatesApi = {
   search: (q: string) =>
     apiFetch(`/api/debates/search?q=${encodeURIComponent(q)}`),
 
+  getUserPublicDebates: (userId: string) =>
+    apiFetch(`/api/debates?userId=${encodeURIComponent(userId)}&status=COMPLETED,VERDICT_READY&limit=10`),
+
   getComments: (id: string) =>
     apiFetch(`/api/debates/${id}/comments`),
 

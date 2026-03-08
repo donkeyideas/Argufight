@@ -82,30 +82,30 @@ export function LeaderboardScreen({ navigation }: any) {
                 <View style={[styles.podium, { borderBottomColor: colors.border }]}>
                   {/* 2nd place */}
                   {top3[1] && (
-                    <View style={styles.podiumItem}>
+                    <TouchableOpacity style={styles.podiumItem} onPress={() => navigation.navigate('ModalUserProfile', { id: top3[1].id || top3[1].userId })}>
                       <Text style={[styles.podiumRank, { color: MEDAL[1] }]}>2</Text>
                       <Avatar src={top3[1].avatarUrl} fallback={top3[1].username ?? '?'} size="lg" />
                       <Text style={[styles.podiumName, { color: colors.text }]} numberOfLines={1}>{top3[1].username}</Text>
                       <Text style={[styles.podiumElo, { color: MEDAL[1] }]}>{top3[1].eloRating ?? top3[1].elo ?? '—'}</Text>
-                    </View>
+                    </TouchableOpacity>
                   )}
                   {/* 1st place */}
                   {top3[0] && (
-                    <View style={[styles.podiumItem, styles.podiumFirst]}>
+                    <TouchableOpacity style={[styles.podiumItem, styles.podiumFirst]} onPress={() => navigation.navigate('ModalUserProfile', { id: top3[0].id || top3[0].userId })}>
                       <Text style={[styles.podiumRank, { color: MEDAL[0], fontSize: 22 }]}>1</Text>
                       <Avatar src={top3[0].avatarUrl} fallback={top3[0].username ?? '?'} size="xl" />
                       <Text style={[styles.podiumName, { color: colors.text, fontSize: 15 }]} numberOfLines={1}>{top3[0].username}</Text>
                       <Text style={[styles.podiumElo, { color: MEDAL[0], fontSize: 16 }]}>{top3[0].eloRating ?? top3[0].elo ?? '—'}</Text>
-                    </View>
+                    </TouchableOpacity>
                   )}
                   {/* 3rd place */}
                   {top3[2] && (
-                    <View style={styles.podiumItem}>
+                    <TouchableOpacity style={styles.podiumItem} onPress={() => navigation.navigate('ModalUserProfile', { id: top3[2].id || top3[2].userId })}>
                       <Text style={[styles.podiumRank, { color: MEDAL[2] }]}>3</Text>
                       <Avatar src={top3[2].avatarUrl} fallback={top3[2].username ?? '?'} size="lg" />
                       <Text style={[styles.podiumName, { color: colors.text }]} numberOfLines={1}>{top3[2].username}</Text>
                       <Text style={[styles.podiumElo, { color: MEDAL[2] }]}>{top3[2].eloRating ?? top3[2].elo ?? '—'}</Text>
-                    </View>
+                    </TouchableOpacity>
                   )}
                 </View>
               )}

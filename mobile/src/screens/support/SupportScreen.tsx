@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, MessageCircle, Mail, Plus, ChevronRight, ChevronDown } from 'lucide-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../theme';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { supportApi } from '../../api/support';
 import { timeAgo } from '../../utils/notifications';
@@ -147,23 +148,19 @@ export function SupportScreen({ navigation }: any) {
         {showCreate && (
           <Card>
             <Text style={{ color: colors.text, fontSize: 15, fontWeight: '500', marginBottom: 12 }}>New Ticket</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }, { color: colors.text }]}
+            <Input
               placeholder="Subject"
-              placeholderTextColor={colors.text3}
               value={subject}
               onChangeText={setSubject}
               returnKeyType="next"
             />
-            <TextInput
-              style={[styles.input, styles.textarea, { backgroundColor: colors.surface, borderColor: colors.border }, { color: colors.text }]}
+            <Input
               placeholder="Describe your issue..."
-              placeholderTextColor={colors.text3}
               value={description}
               onChangeText={setDescription}
               multiline
               numberOfLines={5}
-              textAlignVertical="top"
+              style={{ minHeight: 100, textAlignVertical: 'top' }}
             />
             <Button variant="accent" size="md" fullWidth loading={submitting} onPress={handleCreateTicket}>
               Submit Ticket
@@ -211,8 +208,6 @@ const styles = StyleSheet.create({
   faqQuestion: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   faqQ: { fontSize: 14, fontWeight: '500', flex: 1, paddingRight: 8 },
   faqA: { fontSize: 13, lineHeight: 20, marginTop: 8 },
-  input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, marginBottom: 12 },
-  textarea: { minHeight: 90, textAlignVertical: 'top' },
   sectionTitle: { fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.5, marginTop: 8 },
   ticketRow: { flexDirection: 'row', alignItems: 'center' },
   ticketMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
