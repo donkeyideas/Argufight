@@ -86,7 +86,7 @@ export function Topnav({ user }: TopnavProps) {
             href="/upgrade"
             className="text-[13px] lg:text-[14px] font-[600] text-[var(--amber)] tracking-[0.3px] hover:text-[var(--amber-2)] transition-colors"
           >
-            {user.coins.toLocaleString()} coins
+            {user.coins.toLocaleString('en-US')} coins
           </Link>
         )}
 

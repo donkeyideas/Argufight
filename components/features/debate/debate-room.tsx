@@ -570,7 +570,7 @@ function InfoRow({ label, value, accent }: { label: string; value: any; accent?:
   return (
     <div className="flex items-center justify-between">
       <p className="text-[14px] text-text-3">{label}</p>
-      <p className={cn('text-[14px] font-[450]', accent ? 'text-accent' : 'text-text-2')}>
+      <p className={cn('text-[14px] font-[450]', accent ? 'text-accent' : 'text-text-2')} suppressHydrationWarning>
         {String(value)}
       </p>
     </div>
